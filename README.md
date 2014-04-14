@@ -1,4 +1,4 @@
-README [![Build Status]
+README
 ======
 
 What is Checkdomain/Comodo
@@ -10,7 +10,7 @@ The API also offers a function to enter the DCV authorization code, which has be
 Requirements
 ------------
 Checkdomain/comodo requires
-php >= 5.3
+php >= 5.3 and 
 guzzle >= 3.8,<4
 
 Installation
