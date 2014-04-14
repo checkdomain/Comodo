@@ -1,0 +1,27 @@
+{
+    "name":         "checkomain/comodo",
+    "description":  "Checkdomain/Comodo provides functions to communicate with the comodo SSL certificate provider",
+    "keywords":     ["comodo", "ssl"],
+    "type":         "library",
+    "license":      "MIT",
+    "authors": [
+        {
+            "name":     "Tobias Nitsche",
+            "email":    "t.nitsche@checkdomain.de",
+            "homepage": "http://checkdomain.de"
+        }
+    ],
+    "require": {
+        "php":      ">=5.3"
+    },
+    "require-dev": {
+        "guzzle/guzzle": "dev-master",
+        "phpunit/phpunit": "3.7.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Checkdomain\\Comodo\\": "lib",
+            "Checkdomain\\Comodo\\Tests": "tests"
+        }
+    }
+}
