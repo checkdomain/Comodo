@@ -1,73 +1,56 @@
 <?php
 namespace Checkdomain\Comodo;
 
-use Checkdomain\Comodo\Model\Account;
-use Guzzle\Http\Client;
+use Checkdomain\Comodo\Model\Exception\AccountException;
+use Checkdomain\Comodo\Model\Exception\ArgumentException;
+use Checkdomain\Comodo\Model\Exception\CSRException;
+use Checkdomain\Comodo\Model\Exception\RequestException;
+use Checkdomain\Comodo\Model\Exception\UnknownApiException;
+use Checkdomain\Comodo\Model\Exception\UnknownException;
 
+use Checkdomain\Comodo\Model\Result\AutoApplyResult;
+use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
+
+/**
+ * Class Util
+ * Provides functions to communicate with the Comodo API,requires an Account object, given to the Communication-adapter
+ *
+ * @package Checkdomain\Comodo
+ */
 class Util
 {
-    const COMODO_AUTOAPPLY_URL  = "https://secure.comodo.net/products/!AutoApplySSL";
-    const COMODO_AUTOREVOKE_URL = "https://secure.comodo.net/products/!AutoRevokeSSL";
-    const COMODO_DCV_MAIL_URL   = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
-    const COMODO_DCV_RESEND_URL = "https://secure.comodo.net/products/!ResendDCVEmail";
+    const COMODO_AUTO_APPLY_URL  = "https://secure.comodo.net/products/!AutoApplySSL";
+    const COMODO_AUTO_REVOKE_URL = "https://secure.comodo.net/products/!AutoRevokeSSL";
+    const COMODO_DCV_MAIL_URL    = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
+    const COMODO_DCV_RESEND_URL  = "https://secure.comodo.net/products/!ResendDCVEmail";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
-    const RESPONSE_NEW_LINE    = 0;
-    const RESPONSE_URL_ENCODED = 1;
+    protected $communicationAdapter = null;
 
-    /**
-     * @var Account
-     */
-    protected $account;
-
-    /**
-     * @var Client
-     */
-    protected $client;
-
-    /**
-     * @param \Checkdomain\Comodo\Model\Account $account
+    /*
+     **
+     * @param CommunicationAdapter $client
      *
      * @return Util
      */
-    public function setAccount($account)
+    public function setCommunicationAdapter($communicationAdapter)
     {
-        $this->account = $account;
+        $this->communicationAdapter = $communicationAdapter;
 
         return $this;
     }
 
     /**
-     * @return \Checkdomain\Comodo\Model\Account
+     * @return CommunicationAdapter
      */
-    public function getAccount()
+    public function getCommunicationAdapter()
     {
-        return $this->account;
-    }
-
-    /**
-     * @param \Guzzle\Http\Client $client
-     *
-     * @return Util
-     */
-    public function setClient($client)
-    {
-        $this->client = $client;
-
-        return $this;
-    }
-
-    /**
-     * @return \Guzzle\Http\Client
-     */
-    public function getClient()
-    {
-        if ($this->client == null) {
-            $this->client = new Client();
+        if ($this->communicationAdapter == null) {
+            $this->communicationAdapter = new CommunicationAdapter();
         }
 
-        return $this->client;
+        return $this->communicationAdapter;
     }
 
     /**
@@ -75,16 +58,45 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $param
-     *
-     * @return array
+     * @param $params
+     * @return AutoApplyResult
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
      */
     public function autoApplySSL($params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"] = self::RESPONSE_URL_ENCODED;
+        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
-        return $this->sendToApi(self::COMODO_AUTOAPPLY_URL, $params, self::RESPONSE_URL_ENCODED);
+        // Send request
+        $arr = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_APPLY_URL, $params,
+                                                           CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        // Successful
+        if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
+            $result = new AutoApplyResult();
+
+            if ($arr["errorCode"] == 0) {
+                $paid = true;
+            } else {
+                $paid = false;
+            }
+
+            $result
+                ->setPaid($paid)
+                ->setCertificateID($arr["certificateID"])
+                ->setExpectedDeliveryTime($arr["expectedDeliveryTime"])
+                ->setOrderNumber($arr["orderNumber"])
+                ->setTotalCost($arr["totalCost"]);
+
+            return $result;
+        } else {
+            throw $this->createException($arr);
+        }
     }
 
     /**
@@ -92,243 +104,189 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $param
-     *
-     * @return array
+     * @param $params
+     * @return bool
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
      */
     public function autoRevokeSSL($params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"] = self::RESPONSE_URL_ENCODED;
+        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
-        return $this->sendToApi(self::COMODO_AUTOREVOKE_URL, $params, self::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_REVOKE_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        if ($responseArray["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($responseArray);
+        }
     }
 
     /**
-     * Function to resend the DCV mail
+     * Function to resend the DCV Email
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $param
-     *
-     * @return array
+     * @param $params
+     * @return bool
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
      */
-    public function resendDCVMail($params)
+    public function resendDCVEMail($params)
     {
         // Response is always url encoded
-        return $this->sendToApi(self::COMODO_DCV_RESEND_URL, $params, self::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_DCV_RESEND_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        if ($responseArray["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($responseArray);
+        }
     }
 
     /**
-     * Function to enter to get the DCV mail adresses
+     * Function to get the DCV e-mail address-list
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $param
+     * @param $params
+     * @return GetDCVEMailAddressListResult
      *
-     * @return array
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
      */
-    public function getDCVMailAddresses($params)
+    public function getDCVEMailAddressList($params)
     {
         // Response is always new line encoded
-        return $this->sendToApi(self::COMODO_DCV_MAIL_URL, $params, self::RESPONSE_NEW_LINE);
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_DCV_MAIL_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_NEW_LINE);
+
+        if ($responseArray["errorCode"] == 0) {
+            $result = new GetDCVEMailAddressListResult();
+
+            $result
+                ->setDomainName($responseArray["domain_name"])
+                ->setWhoisEmail($responseArray["whois_email"])
+                ->setLevel2Emails($responseArray["level2_email"])
+                ->setLevel3Emails($responseArray["level3_email"]);
+
+            return $result;
+        } else {
+            throw $this->createException($responseArray);
+        }
     }
 
     /**
      * Function to enter the DCV code, coming from DCV E-Mail
      *
-     * @param $param
-     *
-     * @return array
+     * @param $params
+     * @return bool
+     * @throws Model\Exception\UnknownException
+     * @throws Model\Exception\ArgumentException
      */
     public function enterDCVCode($params)
     {
-        $return = array();
-
         // Check parameters
         if (!isset($params["dcvCode"])) {
-            $return["errorcode"]    = -3;
-            $return["errorMessage"] = "Please provide a DVC code";
-
-            return $return;
+            throw new ArgumentException(-3, 'Please provide an order-number', 'dcvCode', '');
         }
 
         if (!isset($params["orderNumber"])) {
-            $return["errorcode"]   = -3;
-            $return["orderNumber"] = "Please provide an order-number";
-
-            return $return;
+            throw new ArgumentException(-3, 'Please provide an order-number', 'orderNumber', '');
         }
 
         // this is not a official request, so we need to use the website
-        $responseString = $this->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
+        $responseString = $this->getCommunicationAdapter()->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
 
         // Decode answer from website
         if (stristr($responseString, "You have entered the correct Domain Control Validation code") != false) {
-            $return["errorcode"]        = 0;
-        } else if (stristr($responseString, "the certificate has already been issued") != false) {
-            $return["errorcode"]        = 4;
-            $return["errorMessage"]     = "The certificate has already been issued";
-        } else if (stristr($responseString, "Invalid Validation Code!") != false) {
-            $return["errorcode"]        = 3;
-            $return["errorMessage"]     = "Invalid Validation Code";
+            return true;
+        } else if (stristr($responseString, 'the certificate has already been issued') != false) {
+            throw new ArgumentException(-104, 'The certificate has already been issued', 'certificate', $responseString);
+        } else if (stristr($responseString, 'Invalid Validation Code!') != false) {
+            throw new ArgumentException(-103, 'Invalid Validation Code', 'validation-code', $responseString);
         } else {
-            $return["errorcode"]        = 99;
-            $return["errorMessage"]     = "Unknown error";
-            $return["originalResponse"] = $responseString;
-        }
-
-        return $return;
-    }
-
-    /**
-     * Sends a query to the provided url and return the response body.
-     *
-     * @param $url
-     * @param $params
-     *
-     * @return string
-     */
-    protected function sendToWebsite($url, $params)
-    {
-        $url_encoded = http_build_query($params);
-
-        // Sending request
-        $client  = $this->getClient();
-        $request = $client->post($url, null, $url_encoded);
-
-        $response = $request->send();
-
-        // Getting response body
-        $responseString = $response->getBody(true);
-        $responseString = trim($responseString);
-
-        return $responseString;
-    }
-
-    /**
-     * Send a request to the comodo API, and decodes the response as given
-     *
-     * @param $url
-     * @param $params
-     * @param int $responseType
-     *
-     * @return array|bool
-     */
-    protected function sendToApi($url, $params, $responseType = self::RESPONSE_NEW_LINE)
-    {
-        if (!$this->preSendToApiCheck()) {
-            return false;
-        }
-
-        // Merging post-data
-        $fields                  = array();
-        $fields["loginName"]     = $this->getAccount()->getLoginName();
-        $fields["loginPassword"] = $this->getAccount()->getLoginPassword();
-        $fields                  = array_merge($fields, $params);
-
-        // Sending request
-        $client   = $this->getClient();
-        $request  = $client->post($url, null, $fields);
-        $response = $request->send();
-
-        // Getting response body
-        $responseString = $response->getBody(true);
-        $responseString = trim($responseString);
-
-        // Decoding and returning response
-        if ($responseType == self::RESPONSE_NEW_LINE) {
-            return $this->decodeNewLineEncodedResponse($responseString);
-        } else if ($responseType == self::RESPONSE_URL_ENCODED) {
-            return $this->decodeUrlEncodedResponse($responseString);
+            throw new UnknownException(99, 'UnknownException', $responseString);
         }
     }
 
     /**
-     * Checks, if a valid account has been provided
+     * Function to create an exception for API errorcodes
      *
-     * @return bool
-     * @throws \Exception
+     * @param $responseArray
+     * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
      */
-    protected function preSendToApiCheck()
+    protected function createException($responseArray)
     {
-        if ($this->getAccount() == null) {
-            throw new \Exception("Please provided an account");
+        $className = null;
+
+        switch ($responseArray["errorCode"]) {
+            case -1: // Not using https:
+            case -17: // Wrong HTTP-method
+                return new RequestException($responseArray["errorCode"],
+                                            $responseArray["errorMessage"],
+                                            $responseArray["responseString"]);
+                break;
+
+            case -2: // unrecognized argument
+            case -3: // missing argument
+            case -4: // invalid argument
+            case -7: // invalid ISO Country
+            case -18: // Name = Fully-Qualified Domain Name
+            case -35: // Name = = IP
+            case -19: // Name = = Accessible IP
+                return new ArgumentException($responseArray["errorCode"],
+                                             $responseArray["errorMessage"],
+                                             $responseArray["errorItem"],
+                                             $responseArray["responseString"]);
+                break;
+
+            case -16: // Permission denied
+            case -15: // insufficient credits
+                return new AccountException($responseArray["errorCode"],
+                                            $responseArray["errorMessage"],
+                                            $responseArray["responseString"]);
+
+            case -5: // contains wildcard
+            case -6: // no wildcard, but must have
+            case -8: // missing field
+            case -9: // base64 decode exception
+            case -10: // decode exception
+            case -11: // unsupported algorithm
+            case -12: // invalid signature
+            case -13: // unsupported key size
+            case -20: // Already rejected
+            case -21: // Already revoked
+            case -26: // current being issued
+            case -40: // key compromised
+                return new CSRException($responseArray["errorCode"],
+                                        $responseArray["errorMessage"],
+                                        $responseArray["responseString"]);
+                break;
+
+            case -14:
+                return new UnknownApiException($responseArray["errorCode"],
+                                               $responseArray["errorMessage"],
+                                               $responseArray["responseString"]);
+                break;
+
+            default:
+                return new UnknownException($responseArray["errorCode"],
+                                            $responseArray["errorMessage"],
+                                            $responseArray["responseString"]);
+                break;
         }
-
-        if (!$this->getAccount()->isValid()) {
-            throw new \Exception("Please provided valid account");
-        }
-
-        return true;
-    }
-
-    /**
-     * Decodes a responseString, separated by new lines
-     *
-     * @param $responseString
-     * @return array
-     */
-    protected function decodeNewLineEncodedResponse($responseString)
-    {
-        // Spliting reponse body
-        $parts = explode("\n", $responseString);
-
-        // Getting the status
-        $status = trim($parts[0]);
-
-        $ret = array();
-
-        // Valid answer?
-        if (is_numeric($status)) {
-            // Successful?
-            if ($status != "0") {
-                $ret["errorCode"]    = $status;
-                $ret["errorMessage"] = trim($parts[1]);
-                $ret["errorItem"]    = "";
-            } else {
-                for ($i = 1; $i < count($parts); $i++) {
-                    $tmp = preg_split("/[\s\t]+/", $parts[$i], 2);
-
-                    $key   = trim($tmp[0]);
-                    $value = trim($tmp[1]);
-
-                    // if key already exists, open new array dimension
-                    if (isset($ret[$key])) {
-                        if (!is_array($ret[$key])) {
-                            $tmp_value   = $ret[$key];
-                            $ret[$key]   = array();
-                            $ret[$key][] = $tmp_value;
-                        } else {
-                            $ret[$key][] = $value;
-                        }
-                    } else {
-                        // Just save
-                        $ret[$key] = $value;
-                    }
-                }
-            }
-        } else {
-            $ret["errorCode"]    = "";
-            $ret["errorMessage"] = trim($responseString);
-            $ret["errorItem"]    = "";
-        }
-
-        return $ret;
-    }
-
-    /**
-     * Decodes a responseString, encoded in query-string-format
-     *
-     * @param $responseString
-     * @return array
-     */
-    protected function decodeUrlEncodedResponse($responseString)
-    {
-        // Splitting response body
-        $responseString = urldecode($responseString);
-        parse_str($responseString, $arr);
-
-        return $arr;
     }
 }

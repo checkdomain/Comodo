@@ -1,14 +1,20 @@
 <?php
 namespace Checkdomain\Comodo\Model;
 
+/**
+ * Class Account
+ * Provides the login username and password to comodo
+ *
+ * @package Checkdomain\Comodo\Model
+ */
 class Account
 {
     private $loginName;
     private $loginPassword;
 
     /**
-     * @param null $loginName
-     * @param null $loginPassword
+     * @param string|null $loginName
+     * @param string|null $loginPassword
      */
     public function __construct($loginName = null, $loginPassword = null) {
         $this->setLoginName($loginName);
