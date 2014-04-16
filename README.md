@@ -30,16 +30,10 @@ Usage
 -----
 To send a request to comodo, just instantiate the Util class and call any of the available functions.
 
-The API always tells you , if a parameter is missing or wrong formatted.
+The API always throws and Exception , if a parameter is missing or wrong formatted, or anything else did not work.
 
-You always get an array as return-value. If a request has been successful, it returns
-
-```php
-array
-{
-    "errorcode" => 0
-}
-```
+If a request has been successfully, you will get the return value true, or in case of using the AutoApply or
+GetDCVEmailAddressList function, you receive a result-object with additional information.
 
 Contributing
 ------------
