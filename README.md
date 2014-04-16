@@ -11,7 +11,7 @@ Requirements
 ------------
 Checkdomain/comodo requires
 php >= 5.3 and 
-guzzle >= 3.8,<4
+guzzle >= 3.*,<4
 
 Installation
 ------------
