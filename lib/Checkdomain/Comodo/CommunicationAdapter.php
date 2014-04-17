@@ -44,6 +44,15 @@ class CommunicationAdapter
         return $this->account;
     }
 
+    /**
+     * Constructs a communication adapter with an account
+     *
+     * @param Account $account
+     */
+    public function __construct(Account $account) {
+            $this->account = $account;
+    }
+
     /*
     **
     * @param \Guzzle\Http\Client $client

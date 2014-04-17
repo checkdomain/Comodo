@@ -28,6 +28,15 @@ class Util
 
     protected $communicationAdapter = null;
 
+    /**
+     * Constructs the Util with a communicationAdapter
+     *
+     * @param CommunicationAdapter $communicationAdapter
+     */
+    public function __construct(CommunicationAdapter $communicationAdapter) {
+        $this->communicationAdapter = $communicationAdapter;
+    }
+    
     /*
      **
      * @param CommunicationAdapter $client
