@@ -12,10 +12,11 @@
         }
     ],
     "require": {
-        "php":      ">=5.3"
+        "php": ">=5.3",
+        "zendframework/zend-mail": ">= 2.3.1",
+        "guzzle/guzzle": "3.*"
     },
     "require-dev": {
-        "guzzle/guzzle": "3.*",
         "phpunit/phpunit": "3.7.*"
     },
     "autoload": {

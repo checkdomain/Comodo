@@ -11,6 +11,10 @@ use Checkdomain\Comodo\Model\Exception\UnknownException;
 use Checkdomain\Comodo\Model\Result\AutoApplyResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 
+use Zend\Mail\Storage\Folder;
+use Zend\Mail\Storage\Message;
+
+
 /**
  * Class Util
  * Provides functions to communicate with the Comodo API,requires an Account object, given to the Communication-adapter
@@ -27,16 +31,21 @@ class Util
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
     protected $communicationAdapter = null;
+    protected $imapWithSearch       = null;
+    protected $imapHelper           = null;
 
     /**
      * Constructs the Util with a communicationAdapter
      *
      * @param CommunicationAdapter $communicationAdapter
      */
-    public function __construct(CommunicationAdapter $communicationAdapter) {
+    public function __construct(CommunicationAdapter $communicationAdapter = null, ImapWithSearch $imapWithSearch = null, ImapHelper $imapHelper = null)
+    {
         $this->communicationAdapter = $communicationAdapter;
+        $this->imapWithSearch = $imapWithSearch;
+        $this->imapHelper = $imapHelper;
     }
-    
+
     /*
      **
      * @param CommunicationAdapter $client
@@ -61,6 +70,52 @@ class Util
 
         return $this->communicationAdapter;
     }
+
+    /**
+     * @param ImapHelper $imapHelper
+     *
+     * @return Util
+     */
+    public function setImapHelper(ImapHelper $imapHelper)
+    {
+        $this->imapHelper = $imapHelper;
+
+        return $this;
+    }
+
+    /**
+     * @return ImapHelper
+     */
+    public function getImapHelper()
+    {
+        if ($this->imapHelper == null) {
+            $this->imapHelper = new ImapHelper();
+        }
+
+        return $this->imapHelper;
+    }
+
+    /**
+     * @param ImapWithSearch $imapWithSearch
+     *
+     * @return Util
+     */
+    public function setImapWithSearch(ImapWithSearch $imapWithSearch)
+    {
+        $this->imapWithSearch = $imapWithSearch;
+
+        return $this;
+    }
+
+    /**
+     * @return ImapWithSearch
+     */
+    public function getImapWithSearch()
+    {
+        return $this->imapWithSearch;
+    }
+
+
 
     /**
      * Function apply for a certificate
@@ -232,6 +287,31 @@ class Util
     }
 
     /**
+     * @param string $domainName
+     * @param int    $orderNumber
+     */
+    public function getMails($domainName, $orderNumber = null)
+    {
+        if ($orderNumber != null) {
+            $search = array(
+                ' OR OR OR '.
+                ' BODY "'.$orderNumber.'"'.
+                ' SUBJECT "'.$orderNumber.'"'.
+                ' BODY "'.$domainName.'"'.
+                ' SUBJECT "'.$domainName.'"'
+            );
+        } else {
+            $search = array(
+                ' OR '.
+                ' BODY "'.$domainName.'"'.
+                ' SUBJECT "'.$domainName.'"'
+            );
+        }
+
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search);
+    }
+
+    /**
      * Function to create an exception for API errorcodes
      *
      * @param $responseArray
@@ -242,7 +322,7 @@ class Util
         $className = null;
 
         switch ($responseArray["errorCode"]) {
-            case -1: // Not using https:
+            case -1:  // Not using https:
             case -17: // Wrong HTTP-method
                 return new RequestException($responseArray["errorCode"],
                                             $responseArray["errorMessage"],

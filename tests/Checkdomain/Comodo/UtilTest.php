@@ -1,6 +1,9 @@
 <?php
 namespace Checkdomain\Comodo\Tests;
 
+use Checkdomain\Comodo\CommunicationAdapter;
+use Checkdomain\Comodo\ImapHelper;
+use Checkdomain\Comodo\ImapWithSearch;
 use Checkdomain\Comodo\Model\Account;
 use Checkdomain\Comodo\Util;
 
@@ -48,11 +51,8 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $responseText .= "certificateID=abc123456&";
         $responseText .= "expectedDeliveryTime=123456&";
 
-        $util    = new Util();
-        $account = new Account("test_user", "test_password");
-
+        $util = $this->createUtilClass();
         $util->getCommunicationAdapter()->setClient($this->createClientMock($responseText));
-        $util->getCommunicationAdapter()->setAccount($account);
 
         $params = array(
             "test"                => "Y",
@@ -84,12 +84,8 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $responseText .= "domain_name	www.test-domain.org\n";
         $responseText .= "whois_email	 support@test-domain.org\n";
 
-        $util = new Util();
-
-        $account = new Account("test_user", "test_password");
-
+        $util = $this->createUtilClass();
         $util->getCommunicationAdapter()->setClient($this->createClientMock($responseText));
-        $util->getCommunicationAdapter()->setAccount($account);
 
         $params = array(
             "domainName" => "www.test-domain.org"
@@ -111,12 +107,8 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         // simulated response Text
         $responseText = "errorcode=0";
 
-        $util = new Util();
-
-        $account = new Account("test_user", "test_password");
+        $util = $this->createUtilClass();
         $util->getCommunicationAdapter()->setClient($this->createClientMock($responseText));
-
-        $util->getCommunicationAdapter()->setAccount($account);
 
         $params = array(
             "orderNumber"     => "1234567",
@@ -134,13 +126,12 @@ class UtilTest extends \PHPUnit_Framework_TestCase
     public function testEnterDCVCode()
     {
         // simulated response Text
-        $responseText =  "<html><body><p>You have entered the correct Domain Control Validation code. ";
+        $responseText = "<html><body><p>You have entered the correct Domain Control Validation code. ";
         $responseText .= "Your certificate will now be issued and emailed to you shortly. ";
         $responseText .= "Please close this window now.";
         $responseText .= "</p></body></html>";
 
-        $util = new Util();
-
+        $util = $this->createUtilClass();
         $util->getCommunicationAdapter()->setClient($this->createClientMock($responseText));
 
         $params = array(
@@ -160,10 +151,8 @@ class UtilTest extends \PHPUnit_Framework_TestCase
     {
         $responseText = "errorcode=0";
 
-        $util    = new Util();
-        $account = new Account("test_user", "test_password");
+        $util = $this->createUtilClass();
         $util->getCommunicationAdapter()->setClient($this->createClientMock($responseText));
-        $util->getCommunicationAdapter()->setAccount($account);
 
         $params = array(
             "orderNumber" => "1234567"
@@ -172,5 +161,21 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $return = $util->autoRevokeSSL($params);
 
         $this->assertEquals(true, $return);
+    }
+
+    /**
+     * little helper to create the util class
+     *
+     * @return Util
+     */
+    protected function createUtilClass()
+    {
+        $imapHelper           = null;
+        $imapWithSearch       = null;
+        $communicationAdapter = new CommunicationAdapter(new Account("test_user", "test_password"));
+
+        $util = new Util($communicationAdapter, $imapWithSearch, $imapHelper);
+
+        return $util;
     }
 }
