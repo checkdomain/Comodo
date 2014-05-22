@@ -163,6 +163,12 @@ class UtilTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(true, $return);
     }
 
+    public function testMail() {
+        $util = $this->createUtilClass();
+
+        print_r($util->getMails("www.tobias-nitsche.de", 14365102));
+    }
+
     /**
      * little helper to create the util class
      *
@@ -170,8 +176,17 @@ class UtilTest extends \PHPUnit_Framework_TestCase
      */
     protected function createUtilClass()
     {
-        $imapHelper           = null;
-        $imapWithSearch       = null;
+        #$imapHelper           = null;
+        #$imapWithSearch       = null;
+
+        $imapHelper = new ImapHelper();
+        $imapWithSearch = new ImapWithSearch(array(
+            'host'     => 'mail.checkdomain.de',
+            'ssl'      => 'TLS',
+            'user'     => 'cdssl',
+            'password' => 'TrooperDoooper717'
+        ));
+
         $communicationAdapter = new CommunicationAdapter(new Account("test_user", "test_password"));
 
         $util = new Util($communicationAdapter, $imapWithSearch, $imapHelper);

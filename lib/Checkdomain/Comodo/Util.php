@@ -308,7 +308,29 @@ class Util
             );
         }
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search);
+        $subjects['order_received'] = 'Your order has been received';
+        $subjects['information_required'] = 'Information Required: ';
+        $subjects['confirmation'] = 'CONFIRMATION';
+        $subjects['1_expiry'] = 'Customer certificate expiry warning (1 days)';
+        $subjects['7_expiry'] = 'Customer certificate expiry warning (7 days)';
+        $subjects['14_expiry'] = 'Customer certificate expiry warning (14 days)';
+        $subjects['30_expiry'] = 'Customer certificate expiry warning (30 days)';
+        $subjects['60_expiry'] = 'Customer certificate expiry warning (60 days)';
+
+        $mails = $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search);
+
+        foreach($mails as $i => $mail) {
+            $mails[$i]['status'] = null;
+
+            foreach($subjects as $key => $subject) {
+                if(stristr($mail['subject'], $subject) !== false) {
+                    $mails[$i]['status'] = $key;
+                    break;
+                }
+            }
+        }
+
+        return $mails;
     }
 
     /**

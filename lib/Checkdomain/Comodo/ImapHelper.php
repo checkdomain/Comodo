@@ -70,4 +70,6 @@ class ImapHelper
 
         return quoted_printable_decode(strip_tags($text));
     }
+
+
 }
