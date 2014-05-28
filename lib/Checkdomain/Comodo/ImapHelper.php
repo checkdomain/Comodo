@@ -58,8 +58,20 @@ class ImapHelper
 
                 $messages[$i]['id'] = $i;
                 $messages[$i]['folder'] =$folder;
-                $messages[$i]['subject'] = utf8_decode($message->subject);
-                $messages[$i]['received'] = strtotime($message->date);
+
+                // Zend-mail sometimes got problems, with incorrect e-mails
+                try {
+                    $messages[$i]['subject'] = utf8_decode($message->subject);
+                } catch(\Exception $e) {
+                    $messages[$i]['subject'] = '-No subject-';
+                }
+
+                try {
+                    $messages[$i]['received'] = strtotime($message->date);
+                } catch(\Exception $e) {
+                    $messages[$i]['received'] = '-No date-';
+                }
+
                 $messages[$i]['plainText'] = $this->getPlainText($message);
                 $messages[$i]['type'] = $this->getTypeOfMail($messages[$i]);
 
@@ -68,12 +80,13 @@ class ImapHelper
                     $messages[$i]['domainName'] = $this->assumeDomainName($messages[$i]);
                 }
 
-                if ($markProcessed) {
-                    $this->markProcessed($imap, $message, $id);
+                $success = true;
+                if (is_callable($callbackFunction)) {
+                    $success = $callbackFunction($id, $messages[$i]);
                 }
 
-                if (is_callable($callbackFunction)) {
-                    $callbackFunction($id, $messages[$i]);
+                if ($markProcessed && $success) {
+                    $this->markProcessed($imap, $message, $id);
                 }
             }
 
@@ -130,7 +143,7 @@ class ImapHelper
         $text = null;
         try {
             if ($message->isMultipart()) {
-                for($i = 0; $i < $message->countParts(); $i++)
+                for ($i = 0; $i < $message->countParts(); $i++)
                 {
                     $part = $message->getPart($i+1);
                     if ($part->getHeaders() != null) {
