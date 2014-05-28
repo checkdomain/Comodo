@@ -289,7 +289,7 @@ class Util
      *
      * @return mixed
      */
-    public function getMails($domainName, $orderNumber = null)
+    public function getMails($domainName, $orderNumber = null, $callbackFunction = null)
     {
         if ($orderNumber != null) {
             $search = array(
@@ -307,7 +307,7 @@ class Util
             );
         }
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search);
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false, $callbackFunction);
     }
 
     /**
@@ -315,13 +315,13 @@ class Util
      *
      * @return mixed
      */
-    public function getUnprocessedMails($markProcessed = true)
+    public function getUnprocessedMails($markProcessed = true, \Closure $callbackFunction = null)
     {
         $search = array(
             ' NOT KEYWORD "'.ImapHelper::PROCESSED_FLAG.'"'
         );
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed, true);
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed, true, $callbackFunction);
     }
 
     /**

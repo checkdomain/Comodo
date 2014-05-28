@@ -15,14 +15,14 @@ class ImapHelper
     const PROCESSED_FLAG = 'checkdomain_comodo_processed';
 
     public static $subjects = array(
-            'order_received' => 'Your order has been received',
-            'information_required' => 'Information Required: ',
-            'confirmation' => 'CONFIRMATION',
-            '1_expiry' => 'Customer certificate expiry warning (1 days)',
-            '7_expiry' => 'Customer certificate expiry warning (7 days)',
-            '14_expiry' => 'Customer certificate expiry warning (14 days)',
-            '30_expiry' => 'Customer certificate expiry warning (30 days)',
-            '60_expiry' => 'Customer certificate expiry warning (60 days)'
+        'order_received' => 'Your order has been received',
+        'information_required' => 'Information Required: ',
+        'confirmation' => 'CONFIRMATION',
+        '1_expiry' => 'Customer certificate expiry warning (1 days)',
+        '7_expiry' => 'Customer certificate expiry warning (7 days)',
+        '14_expiry' => 'Customer certificate expiry warning (14 days)',
+        '30_expiry' => 'Customer certificate expiry warning (30 days)',
+        '60_expiry' => 'Customer certificate expiry warning (60 days)'
     );
 
     public static $bodies = array(
@@ -41,7 +41,7 @@ class ImapHelper
      *
      * @return array
      */
-    public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false)
+    public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
     {
         if ($folders === null) {
             $folders = $imap->getFolders();
@@ -63,19 +63,21 @@ class ImapHelper
                 $messages[$i]['plainText'] = $this->getPlainText($message);
                 $messages[$i]['type'] = $this->getTypeOfMail($messages[$i]);
 
-                if ($assume)
-                {
+                if ($assume) {
                     $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
                     $messages[$i]['domainName'] = $this->assumeDomainName($messages[$i]);
                 }
 
-                if ($markProcessed)
-                {
+                if ($markProcessed) {
                     $this->markProcessed($imap, $message, $id);
+                }
+
+                if (is_callable($callbackFunction)) {
+                    $callbackFunction($id, $messages[$i]);
                 }
             }
 
-            $messages = $this->fetchMails($imap, $messages, $search, $folder);
+            $messages = $this->fetchMails($imap, $messages, $search, $folder, $markProcessed, $assume, $callbackFunction);
         }
 
         return $messages;
@@ -128,9 +130,13 @@ class ImapHelper
         $text = null;
         try {
             if ($message->isMultipart()) {
-                foreach ($message as $part) {
-                    if (strtok($part->contentType, ';') == 'text/plain') {
-                        $text = $part;
+                for($i = 0; $i < $message->countParts(); $i++)
+                {
+                    $part = $message->getPart($i+1);
+                    if ($part->getHeaders() != null) {
+                        if (strtok($part->contentType, ';') == 'text/plain') {
+                            $text = $part;
+                        }
                     }
                 }
             } else {
@@ -160,7 +166,7 @@ class ImapHelper
         $matches = array();
         preg_match($pattern, $message['plainText'], $matches);
 
-        if(!empty($matches[1])) {
+        if (!empty($matches[1])) {
             return $matches[1];
         }
 
