@@ -43,7 +43,7 @@ class ImapHelper
      */
     public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false)
     {
-        if($folders === null) {
+        if ($folders === null) {
             $folders = $imap->getFolders();
         }
 
@@ -63,15 +63,15 @@ class ImapHelper
                 $messages[$i]['plainText'] = $this->getPlainText($message);
                 $messages[$i]['type'] = $this->getTypeOfMail($messages[$i]);
 
-                if($assume)
+                if ($assume)
                 {
                     $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
                     $messages[$i]['domainName'] = $this->assumeDomainName($messages[$i]);
                 }
 
-                if($markProcessed)
+                if ($markProcessed)
                 {
-                    $this->markProcessed($imap, $message, $i);
+                    $this->markProcessed($imap, $message, $id);
                 }
             }
 
@@ -88,7 +88,8 @@ class ImapHelper
      * @param Message        $message
      * @param integer        $id
      */
-    protected function markProcessed(ImapWithSearch $imap, Message $message, $id) {
+    protected function markProcessed(ImapWithSearch $imap, Message $message, $id)
+    {
         $flags = $message->getFlags();
         $flags[] = self::PROCESSED_FLAG;
 
