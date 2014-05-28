@@ -1,6 +1,7 @@
 <?php
 namespace Checkdomain\Comodo;
 
+use Zend\Mail\Storage\Imap;
 use Zend\Mail\Storage\Message;
 use Zend\Mail\Storage\Folder;
 
@@ -11,6 +12,8 @@ use Zend\Mail\Storage\Folder;
  */
 class ImapHelper
 {
+    const PROCESSED_FLAG = 'checkdomain_comodo_processed';
+
     public static $subjects = array(
             'order_received' => 'Your order has been received',
             'information_required' => 'Information Required: ',
@@ -23,18 +26,22 @@ class ImapHelper
     );
 
     public static $bodies = array(
-        'success' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9üצה\.]* is attached!/'
+        'success' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-üצה\.]* is attached!/'
     );
 
     /**
-     * @param ImapWithSearch $imap
-     * @param string          $messages
-     * @param string          $search
-     * @param Folder          $folders
+     *  Fetches the mail recursively, through the folders.
      *
-     * @return mixed
+     * @param ImapWithSearch $imap  imap helper class
+     * @param $messages             (internal)
+     * @param $search               imap-searchterm
+     * @param Folder $folders       the subfolders
+     * @param bool $markProcessed   Sets the flag as processed
+     * @param bool $assume          Assumes domainName / order-Number in the mail
+     *
+     * @return array
      */
-    public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $assume = false)
+    public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false)
     {
         if($folders === null) {
             $folders = $imap->getFolders();
@@ -61,12 +68,31 @@ class ImapHelper
                     $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
                     $messages[$i]['domainName'] = $this->assumeDomainName($messages[$i]);
                 }
+
+                if($markProcessed)
+                {
+                    $this->markProcessed($imap, $message, $i);
+                }
             }
 
             $messages = $this->fetchMails($imap, $messages, $search, $folder);
         }
 
         return $messages;
+    }
+
+    /**
+     * Marks the mail with the processed flag
+     *
+     * @param ImapWithSearch $imap
+     * @param Message        $message
+     * @param integer        $id
+     */
+    protected function markProcessed(ImapWithSearch $imap, Message $message, $id) {
+        $flags = $message->getFlags();
+        $flags[] = self::PROCESSED_FLAG;
+
+        $imap->setFlags($id, $flags);
     }
 
     /**

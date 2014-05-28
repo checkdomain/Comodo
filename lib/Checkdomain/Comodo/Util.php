@@ -14,7 +14,6 @@ use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Message;
 
-
 /**
  * Class Util
  * Provides functions to communicate with the Comodo API,requires an Account object, given to the Communication-adapter
@@ -114,8 +113,6 @@ class Util
     {
         return $this->imapWithSearch;
     }
-
-
 
     /**
      * Function apply for a certificate
@@ -287,8 +284,10 @@ class Util
     }
 
     /**
-     * @param string $domainName
-     * @param int    $orderNumber
+     * @param $domainName
+     * @param null $orderNumber
+     *
+     * @return mixed
      */
     public function getMails($domainName, $orderNumber = null)
     {
@@ -311,13 +310,18 @@ class Util
         return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search);
     }
 
-    public function getStatusMails($since)
+    /**
+     * @param bool $markProcessed
+     *
+     * @return mixed
+     */
+    public function getUnprocessedMails($markProcessed = true)
     {
         $search = array(
-            ' SINCE "'.date("d-M-Y", $since).'"'
+            ' NOT KEYWORD "'.ImapHelper::PROCESSED_FLAG.'"'
         );
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, true);
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed, true);
     }
 
     /**
