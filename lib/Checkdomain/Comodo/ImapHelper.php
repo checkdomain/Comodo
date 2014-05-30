@@ -4,6 +4,8 @@ namespace Checkdomain\Comodo;
 use Zend\Mail\Storage\Imap;
 use Zend\Mail\Storage\Message;
 use Zend\Mail\Storage\Folder;
+use Zend\Mail\Storage\Part;
+use Zend\Mime\Decode;
 
 /**
  * Class ImapHelper
@@ -15,14 +17,14 @@ class ImapHelper
     const PROCESSED_FLAG = 'checkdomain_comodo_processed';
 
     public static $subjects = array(
-        'order_received' => 'Your order has been received',
+        'order_received'       => 'Your order has been received',
+        'confirmation'         => 'CONFIRMATION',
         'information_required' => 'Information Required: ',
-        'confirmation' => 'CONFIRMATION',
-        '1_expiry' => 'Customer certificate expiry warning (1 days)',
-        '7_expiry' => 'Customer certificate expiry warning (7 days)',
-        '14_expiry' => 'Customer certificate expiry warning (14 days)',
-        '30_expiry' => 'Customer certificate expiry warning (30 days)',
-        '60_expiry' => 'Customer certificate expiry warning (60 days)'
+        '1_expiry'             => 'Customer certificate expiry warning (1 days)',
+        '7_expiry'             => 'Customer certificate expiry warning (7 days)',
+        '14_expiry'            => 'Customer certificate expiry warning (14 days)',
+        '30_expiry'            => 'Customer certificate expiry warning (30 days)',
+        '60_expiry'            => 'Customer certificate expiry warning (60 days)'
     );
 
     public static $bodies = array(
@@ -32,12 +34,12 @@ class ImapHelper
     /**
      *  Fetches the mail recursively, through the folders.
      *
-     * @param ImapWithSearch $imap  imap helper class
-     * @param $messages             (internal)
+     * @param ImapWithSearch $imap imap helper class
+     * @param $messages (internal)
      * @param $search               imap-searchterm
-     * @param Folder $folders       the subfolders
-     * @param bool $markProcessed   Sets the flag as processed
-     * @param bool $assume          Assumes domainName / order-Number in the mail
+     * @param Folder $folders the subfolders
+     * @param bool $markProcessed Sets the flag as processed
+     * @param bool $assume Assumes domainName / order-Number in the mail
      *
      * @return array
      */
@@ -56,28 +58,29 @@ class ImapHelper
 
                 $message = $imap->getMessage($id);
 
-                $messages[$i]['id'] = $i;
-                $messages[$i]['folder'] =$folder;
+                $messages[$i]['id']     = $i;
+                $messages[$i]['folder'] = $folder;
 
                 // Zend-mail sometimes got problems, with incorrect e-mails
                 try {
                     $messages[$i]['subject'] = utf8_decode($message->subject);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $messages[$i]['subject'] = '-No subject-';
                 }
 
                 try {
                     $messages[$i]['received'] = strtotime($message->date);
-                } catch(\Exception $e) {
+                } catch (\Exception $e) {
                     $messages[$i]['received'] = '-No date-';
                 }
 
                 $messages[$i]['plainText'] = $this->getPlainText($message);
-                $messages[$i]['type'] = $this->getTypeOfMail($messages[$i]);
+                $messages[$i]['attachments'] = $this->getAttachments($message);
+                $messages[$i]['type']      = $this->getTypeOfMail($messages[$i]);
 
                 if ($assume) {
                     $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
-                    $messages[$i]['domainName'] = $this->assumeDomainName($messages[$i]);
+                    $messages[$i]['domainName']  = $this->assumeDomainName($messages[$i]);
                 }
 
                 $success = true;
@@ -90,7 +93,8 @@ class ImapHelper
                 }
             }
 
-            $messages = $this->fetchMails($imap, $messages, $search, $folder, $markProcessed, $assume, $callbackFunction);
+            $messages = $this->fetchMails($imap, $messages, $search, $folder, $markProcessed, $assume,
+                                          $callbackFunction);
         }
 
         return $messages;
@@ -100,12 +104,12 @@ class ImapHelper
      * Marks the mail with the processed flag
      *
      * @param ImapWithSearch $imap
-     * @param Message        $message
-     * @param integer        $id
+     * @param Message $message
+     * @param integer $id
      */
     protected function markProcessed(ImapWithSearch $imap, Message $message, $id)
     {
-        $flags = $message->getFlags();
+        $flags   = $message->getFlags();
         $flags[] = self::PROCESSED_FLAG;
 
         $imap->setFlags($id, $flags);
@@ -117,15 +121,16 @@ class ImapHelper
      * @param array $mail
      * @return null|string
      */
-    protected function getTypeOfMail($mail) {
-        foreach(self::$subjects as $key => $subject) {
-            if(stristr($mail['subject'], $subject) !== false) {
+    protected function getTypeOfMail($mail)
+    {
+        foreach (self::$subjects as $key => $subject) {
+            if (stristr($mail['subject'], $subject) !== false) {
                 return $key;
             }
         }
 
-        foreach(self::$bodies as $key => $body) {
-            if(preg_match($body, $mail['plainText'])) {
+        foreach (self::$bodies as $key => $body) {
+            if (preg_match($body, $mail['plainText'])) {
                 return $key;
             }
         }
@@ -134,31 +139,120 @@ class ImapHelper
     }
 
     /**
-     * @param Message $message
+     * @param Part $part
      *
-     * @return string
+     * @return string|null
      */
-    public function getPlainText(Message $message)
+    public function getPlainText(Part $part)
     {
         $text = null;
-        try {
-            if ($message->isMultipart()) {
-                for ($i = 0; $i < $message->countParts(); $i++)
-                {
-                    $part = $message->getPart($i+1);
-                    if ($part->getHeaders() != null) {
-                        if (strtok($part->contentType, ';') == 'text/plain') {
-                            $text = $part;
-                        }
+
+        if ($part->isMultipart()) {
+            // Parse all parts
+            for ($i = 0; $i < $part->countParts(); $i++) {
+                $subPart = $part->getPart($i + 1);
+
+                // Check for headers, to avoid exceptions
+                if ($subPart->getHeaders() != null) {
+                    if($subPart->isMultipart())
+                    {
+                        // Part is multipart as well
+                        $tmp = $this->getPlainText($subPart);
+                        $text = ($tmp != null) ? $tmp : $text;
+                    } else {
+                        // Try to get plain/text of this content
+                        $tmp = $this->getPlainTextOfPart($subPart);
+                        $text = ($tmp != null) ? $tmp : $text;
                     }
                 }
-            } else {
-                $text = $message->getContent();
+            }
+        } else {
+            // Its not multipart, so try to get its content
+            $text = $this->getPlainTextOfPart($part);
+        }
+
+        return quoted_printable_decode(strip_tags($text));
+    }
+
+    /**
+     * @param Part $part
+     *
+     * @return null|Part
+     */
+    private function getPlainTextOfPart(Part $part)
+    {
+        try {
+            if ($part->getHeaderField('Content-Disposition') == 'attachment') {
+                return null;
             }
         } catch (\Exception $e) {
         }
 
-        return quoted_printable_decode(strip_tags($text));
+        try {
+            // If content-type is text/plain, return its content
+            if ($part->getHeaderField('Content-Type') == 'text/plain') {
+                return $part;
+            }
+        } catch (\Exception $e) {
+            // If content-type is not available (exception thrown), return its content
+            return $part;
+        }
+
+        return null;
+    }
+
+
+
+    /**
+     * @param Message $message
+     *
+     * @return array|null
+     */
+    public function getAttachments(Message $message)
+    {
+        $attachments = null;
+
+        // Only multi-part will have attachments
+        if ($message->isMultipart()) {
+            if ($message->countParts() > 1) {
+                for ($i = 0; $i < $message->countParts(); $i++) {
+                    $part = $message->getPart($i + 1);
+
+                    // Check for headers, to avoid exceptions
+                    if ($part->getHeaders() != null) {
+
+                        // Getting disposition
+                        $disposition = null;
+                        try {
+                            $disposition = $part->getHeaderField('Content-Disposition');
+                        } catch (\Exception $e) {
+                        }
+
+                        if ($disposition == 'attachment') {
+                            $content = quoted_printable_decode($part->getContent());
+
+                            // Encoding?
+                            try {
+                                $transferEncoding = $part->getHeaderField('Content-Transfer-Encoding');
+
+                                if ($transferEncoding == 'base64') {
+                                    $content = base64_decode($content);
+                                }
+                            } catch (\Exception $e) {
+                            }
+
+                            $attachments[] =
+                                array('mime'     => $part->getHeaderField('Content-Type'),
+                                      'filename' => $part->getHeaderField('Content-Disposition', 'filename'),
+                                      'content'  => $content
+                                );
+                        }
+                    }
+                }
+            }
+        }
+
+        return $attachments;
     }
 
     /**
@@ -172,7 +266,7 @@ class ImapHelper
         $matches = array();
         preg_match($pattern, $message['subject'], $matches);
 
-        if(!empty($matches[1])) {
+        if (!empty($matches[1])) {
             return $matches[1];
         }
 
@@ -197,14 +291,14 @@ class ImapHelper
         $matches = array();
         preg_match($pattern, $message['subject'], $matches);
 
-        if(!empty($matches[3])) {
+        if (!empty($matches[3])) {
             return $matches[3];
         }
 
         $matches = array();
         preg_match($pattern, $message['plainText'], $matches);
 
-        if(!empty($matches[3])) {
+        if (!empty($matches[3])) {
             return $matches[3];
         }
 

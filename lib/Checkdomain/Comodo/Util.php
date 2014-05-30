@@ -30,8 +30,8 @@ class Util
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
     protected $communicationAdapter = null;
-    protected $imapWithSearch       = null;
-    protected $imapHelper           = null;
+    protected $imapWithSearch = null;
+    protected $imapHelper = null;
 
     /**
      * Constructs the Util with a communicationAdapter
@@ -41,8 +41,8 @@ class Util
     public function __construct(CommunicationAdapter $communicationAdapter = null, ImapWithSearch $imapWithSearch = null, ImapHelper $imapHelper = null)
     {
         $this->communicationAdapter = $communicationAdapter;
-        $this->imapWithSearch = $imapWithSearch;
-        $this->imapHelper = $imapHelper;
+        $this->imapWithSearch       = $imapWithSearch;
+        $this->imapHelper           = $imapHelper;
     }
 
     /*
@@ -284,44 +284,45 @@ class Util
     }
 
     /**
-     * @param $domainName
-     * @param null $orderNumber
+     * @param string   $domainName
+     * @param null     $orderNumbers
+     * @param callable $callbackFunction
      *
-     * @return mixed
+     * @return array
      */
-    public function getMails($domainName, $orderNumber = null, $callbackFunction = null)
+    public function getMails($domainName, $orderNumbers = null, \Closure $callbackFunction = null)
     {
-        if ($orderNumber != null) {
-            $search = array(
-                ' OR OR OR '.
-                ' BODY "'.$orderNumber.'"'.
-                ' SUBJECT "'.$orderNumber.'"'.
-                ' BODY "'.$domainName.'"'.
-                ' SUBJECT "'.$domainName.'"'
-            );
-        } else {
-            $search = array(
-                ' OR '.
-                ' BODY "'.$domainName.'"'.
-                ' SUBJECT "'.$domainName.'"'
-            );
+        $orList    = ' OR ';
+        $whereList = ' BODY "' . $domainName . '"';
+        $whereList .= ' SUBJECT "' . $domainName . '"';
+
+        foreach ($orderNumbers as $orderNumber) {
+            $orList    .= ' OR OR ';
+            $whereList .= ' BODY "' . $orderNumber . '"';
+            $whereList .= ' SUBJECT "' . $orderNumber . '"';
         }
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false, $callbackFunction);
+        $search = array($orList . " " . $whereList);
+
+
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false,
+                                                  $callbackFunction);
     }
 
     /**
-     * @param bool $markProcessed
+     * @param bool     $markProcessed
+     * @param callable $callbackFunction
      *
-     * @return mixed
+     * @return array
      */
     public function getUnprocessedMails($markProcessed = true, \Closure $callbackFunction = null)
     {
         $search = array(
-            ' NOT KEYWORD "'.ImapHelper::PROCESSED_FLAG.'"'
+            ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"'
         );
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed, true, $callbackFunction);
+        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed,
+                                                  true, $callbackFunction);
     }
 
     /**
@@ -335,7 +336,7 @@ class Util
         $className = null;
 
         switch ($responseArray["errorCode"]) {
-            case -1:  // Not using https:
+            case -1: // Not using https:
             case -17: // Wrong HTTP-method
                 return new RequestException($responseArray["errorCode"],
                                             $responseArray["errorMessage"],
