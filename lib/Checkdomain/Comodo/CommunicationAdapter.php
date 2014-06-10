@@ -88,7 +88,7 @@ class CommunicationAdapter
      */
     public function sendToWebsite($url, $params)
     {
-        $url_encoded = http_build_query($params);
+        $url_encoded = http_build_query($params, '', '&');
 
         // Sending request
         $client  = $this->getClient();
