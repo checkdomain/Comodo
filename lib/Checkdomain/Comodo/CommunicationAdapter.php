@@ -50,7 +50,7 @@ class CommunicationAdapter
      * @param Account $account
      */
     public function __construct(Account $account) {
-            $this->account = $account;
+        $this->account = $account;
     }
 
     /*
@@ -127,6 +127,8 @@ class CommunicationAdapter
         // Sending request
         $client   = $this->getClient();
         $request  = $client->post($url, null, $fields);
+        $query    = http_build_query($params);
+
         $response = $request->send();
 
         // Getting response body
@@ -135,9 +137,9 @@ class CommunicationAdapter
 
         // Decoding and returning response
         if ($responseType == self::RESPONSE_NEW_LINE) {
-            return $this->decodeNewLineEncodedResponse($responseString);
+            return $this->decodeNewLineEncodedResponse($responseString, $query);
         } else if ($responseType == self::RESPONSE_URL_ENCODED) {
-            return $this->decodeUrlEncodedResponse($responseString);
+            return $this->decodeUrlEncodedResponse($responseString, $query);
         }
     }
 
@@ -167,7 +169,7 @@ class CommunicationAdapter
      *
      * @return array
      */
-    protected function decodeNewLineEncodedResponse($responseString)
+    protected function decodeNewLineEncodedResponse($responseString, $requestQuery)
     {
         // Splitting response body
         $parts = explode("\n", $responseString);
@@ -211,6 +213,7 @@ class CommunicationAdapter
         }
 
         $responseArray["responseString"] = $responseString;
+        $responseArray["requestQuery"]   = $requestQuery;
 
         return $responseArray;
     }
@@ -221,13 +224,14 @@ class CommunicationAdapter
      * @param $responseString
      * @return array
      */
-    protected function decodeUrlEncodedResponse($responseString)
+    protected function decodeUrlEncodedResponse($responseString, $requestQuery)
     {
         // Splitting response body
         $responseString = urldecode($responseString);
         parse_str($responseString, $responseArray);
 
         $responseArray["responseString"] = $responseString;
+        $responseArray["requestQuery"]   = $requestQuery;
 
         return $responseArray;
     }

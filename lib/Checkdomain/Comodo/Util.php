@@ -152,7 +152,8 @@ class Util
                 ->setCertificateID($arr["certificateID"])
                 ->setExpectedDeliveryTime($arr["expectedDeliveryTime"])
                 ->setOrderNumber($arr["orderNumber"])
-                ->setTotalCost($arr["totalCost"]);
+                ->setTotalCost($arr["totalCost"])
+                ->setRequestQuery($arr['requestQuery']);
 
             return $result;
         } else {
@@ -241,7 +242,8 @@ class Util
                 ->setDomainName($responseArray["domain_name"])
                 ->setWhoisEmail($responseArray["whois_email"])
                 ->setLevel2Emails($responseArray["level2_email"])
-                ->setLevel3Emails($responseArray["level3_email"]);
+                ->setLevel3Emails($responseArray["level3_email"])
+                ->setRequestQuery($responseArray['requestQuery']);
 
             return $result;
         } else {
