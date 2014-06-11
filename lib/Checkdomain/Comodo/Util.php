@@ -22,10 +22,11 @@ use Zend\Mail\Storage\Message;
  */
 class Util
 {
-    const COMODO_AUTO_APPLY_URL  = "https://secure.comodo.net/products/!AutoApplySSL";
-    const COMODO_AUTO_REVOKE_URL = "https://secure.comodo.net/products/!AutoRevokeSSL";
-    const COMODO_DCV_MAIL_URL    = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
-    const COMODO_DCV_RESEND_URL  = "https://secure.comodo.net/products/!ResendDCVEmail";
+    const COMODO_AUTO_APPLY_URL      = "https://secure.comodo.net/products/!AutoApplySSL";
+    const COMODO_AUTO_REVOKE_URL     = "https://secure.comodo.net/products/!AutoRevokeSSL";
+    const COMODO_DCV_MAIL_URL        = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
+    const COMODO_DCV_RESEND_URL      = "https://secure.comodo.net/products/!ResendDCVEmail";
+    const COMODO_AUTO_UPDATE_DCV_URL = "https://secure.comodo.net/products/!AutoUpdateDCV";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -120,6 +121,7 @@ class Util
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
      * @param $params
+     *
      * @return AutoApplyResult
      * @throws Model\Exception\AccountException
      * @throws Model\Exception\ArgumentException
@@ -167,6 +169,7 @@ class Util
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
      * @param $params
+     *
      * @return bool
      * @throws Model\Exception\AccountException
      * @throws Model\Exception\ArgumentException
@@ -190,11 +193,41 @@ class Util
     }
 
     /**
+     * Function to auto update dcv
+     *
+     * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
+     *
+     * @param $params
+     *
+     * @return bool
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
+    public function AutoUpdateDCV($params)
+    {
+        // Two choices, we want url-encoded
+        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_UPDATE_DCV_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        if ($responseArray["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($responseArray);
+        }
+    }
+
+    /**
      * Function to resend the DCV Email
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
      * @param $params
+     *
      * @return bool
      * @throws Model\Exception\AccountException
      * @throws Model\Exception\ArgumentException
@@ -221,6 +254,7 @@ class Util
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
      * @param $params
+     *
      * @return GetDCVEMailAddressListResult
      *
      * @throws Model\Exception\AccountException
@@ -255,6 +289,7 @@ class Util
      * Function to enter the DCV code, coming from DCV E-Mail
      *
      * @param $params
+     *
      * @return bool
      * @throws Model\Exception\UnknownException
      * @throws Model\Exception\ArgumentException
@@ -299,13 +334,12 @@ class Util
         $whereList .= ' SUBJECT "' . $domainName . '"';
 
         foreach ($orderNumbers as $orderNumber) {
-            $orList    .= ' OR OR ';
+            $orList .= ' OR OR ';
             $whereList .= ' BODY "' . $orderNumber . '"';
             $whereList .= ' SUBJECT "' . $orderNumber . '"';
         }
 
         $search = array($orList . " " . $whereList);
-
 
         return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false,
                                                   $callbackFunction);
@@ -331,6 +365,7 @@ class Util
      * Function to create an exception for API errorcodes
      *
      * @param $responseArray
+     *
      * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
      */
     protected function createException($responseArray)
