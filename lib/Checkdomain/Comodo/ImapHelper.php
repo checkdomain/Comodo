@@ -28,7 +28,7 @@ class ImapHelper
     );
 
     public static $bodies = array(
-        'success' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-üצה\.]* is attached!/'
+        'issued' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-üצה\.]* is attached!/'
     );
 
     /**
@@ -52,6 +52,7 @@ class ImapHelper
         foreach ($folders as $folder) {
             $imap->selectFolder($folder);
             $result = $imap->search($search);
+            $result = array_reverse($result);
 
             foreach ($result as $id) {
                 $i = count($messages);

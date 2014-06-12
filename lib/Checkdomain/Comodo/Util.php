@@ -206,7 +206,7 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function AutoUpdateDCV($params)
+    public function autoUpdateDCV($params)
     {
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
