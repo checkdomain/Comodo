@@ -208,9 +208,6 @@ class Util
      */
     public function autoUpdateDCV($params)
     {
-        // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
-
         $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_UPDATE_DCV_URL, $params,
                                                                      CommunicationAdapter::RESPONSE_URL_ENCODED);
 
