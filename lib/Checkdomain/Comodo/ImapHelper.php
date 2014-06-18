@@ -19,7 +19,7 @@ class ImapHelper
     public static $subjects = array(
         'order_received'       => 'Your order has been received',
         'confirmation'         => 'CONFIRMATION',
-        'information_required' => 'Information Required: ',
+        'information_required' => 'Information Required',
         '1_expiry'             => 'Customer certificate expiry warning (1 days)',
         '7_expiry'             => 'Customer certificate expiry warning (7 days)',
         '14_expiry'            => 'Customer certificate expiry warning (14 days)',
