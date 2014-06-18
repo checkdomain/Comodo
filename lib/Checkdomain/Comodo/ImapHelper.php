@@ -52,7 +52,6 @@ class ImapHelper
         foreach ($folders as $folder) {
             $imap->selectFolder($folder);
             $result = $imap->search($search);
-            $result = array_reverse($result);
 
             foreach ($result as $id) {
                 $i = count($messages);

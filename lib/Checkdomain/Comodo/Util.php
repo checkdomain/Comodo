@@ -27,6 +27,7 @@ class Util
     const COMODO_DCV_MAIL_URL        = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
     const COMODO_DCV_RESEND_URL      = "https://secure.comodo.net/products/!ResendDCVEmail";
     const COMODO_AUTO_UPDATE_DCV_URL = "https://secure.comodo.net/products/!AutoUpdateDCV";
+    const COMODO_PROVIDE_EV_DETAILS  = "https://secure.comodo.net/products/!ProvideEVDetails";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -236,6 +237,19 @@ class Util
     {
         // Response is always url encoded
         $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_DCV_RESEND_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        if ($responseArray["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($responseArray);
+        }
+    }
+
+    public function provideEVDetails($params)
+    {
+         // Response is always url encoded
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_PROVIDE_EV_DETAILS, $params,
                                                                      CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         if ($responseArray["errorCode"] == 0) {
