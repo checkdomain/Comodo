@@ -10,6 +10,7 @@ use Checkdomain\Comodo\Model\Exception\UnknownException;
 
 use Checkdomain\Comodo\Model\Result\AutoApplyResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
+use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
 
 use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Message;
@@ -22,12 +23,13 @@ use Zend\Mail\Storage\Message;
  */
 class Util
 {
-    const COMODO_AUTO_APPLY_URL      = "https://secure.comodo.net/products/!AutoApplySSL";
-    const COMODO_AUTO_REVOKE_URL     = "https://secure.comodo.net/products/!AutoRevokeSSL";
-    const COMODO_DCV_MAIL_URL        = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
-    const COMODO_DCV_RESEND_URL      = "https://secure.comodo.net/products/!ResendDCVEmail";
-    const COMODO_AUTO_UPDATE_DCV_URL = "https://secure.comodo.net/products/!AutoUpdateDCV";
-    const COMODO_PROVIDE_EV_DETAILS  = "https://secure.comodo.net/products/!ProvideEVDetails";
+    const COMODO_AUTO_APPLY_URL         = "https://secure.comodo.net/products/!AutoApplySSL";
+    const COMODO_AUTO_REVOKE_URL        = "https://secure.comodo.net/products/!AutoRevokeSSL";
+    const COMODO_DCV_MAIL_URL           = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
+    const COMODO_DCV_RESEND_URL         = "https://secure.comodo.net/products/!ResendDCVEmail";
+    const COMODO_AUTO_UPDATE_DCV_URL    = "https://secure.comodo.net/products/!AutoUpdateDCV";
+    const COMODO_PROVIDE_EV_DETAILS_URL = "https://secure.comodo.net/products/!ProvideEVDetails";
+    const COMODO_MDC_DOMAIN_DETAILS_URL = "https://secure.comodo.net/products/!GetMDCDomainDetails";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -248,8 +250,8 @@ class Util
 
     public function provideEVDetails($params)
     {
-         // Response is always url encoded
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_PROVIDE_EV_DETAILS, $params,
+        // Response is always url encoded
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_PROVIDE_EV_DETAILS_URL, $params,
                                                                      CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         if ($responseArray["errorCode"] == 0) {
@@ -289,6 +291,41 @@ class Util
                 ->setLevel2Emails($responseArray["level2_email"])
                 ->setLevel3Emails($responseArray["level3_email"])
                 ->setRequestQuery($responseArray['requestQuery']);
+
+            return $result;
+        } else {
+            throw $this->createException($responseArray);
+        }
+    }
+
+    /**
+     * Function to get details of a order-number (this API support just one domain)
+     *
+     * https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/GetMDCDomainDetails%20v1.00.pdf
+     *
+     * @param $params
+     *
+     * @return GetDCVEMailAddressListResult
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
+    public function getMDCDomainDetails($params)
+    {
+        // Response is always new line encoded
+        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_MDC_DOMAIN_DETAILS_URL, $params,
+                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        if ($responseArray["errorCode"] == 0) {
+            $result = new GetMDCDomainDetailsResult();
+
+            $result
+                ->setDomainName($responseArray["1_domainName"])
+                ->setDcvMethod($responseArray["1_dcvMethod"])
+                ->setDcvStatus($responseArray["1_dvcStatus"]);
 
             return $result;
         } else {

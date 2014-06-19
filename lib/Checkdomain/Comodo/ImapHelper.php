@@ -202,7 +202,6 @@ class ImapHelper
     }
 
 
-
     /**
      * @param Message $message
      *
