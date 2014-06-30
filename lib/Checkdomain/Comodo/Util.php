@@ -30,6 +30,7 @@ class Util
     const COMODO_AUTO_UPDATE_DCV_URL    = "https://secure.comodo.net/products/!AutoUpdateDCV";
     const COMODO_PROVIDE_EV_DETAILS_URL = "https://secure.comodo.net/products/!ProvideEVDetails";
     const COMODO_MDC_DOMAIN_DETAILS_URL = "https://secure.comodo.net/products/!GetMDCDomainDetails";
+    const COMODO_AUTO_REPLACE_URL        = "https://secure.comodo.net/products/!AutoReplaceSSL";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -123,7 +124,7 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $params
+     * @param array $params
      *
      * @return AutoApplyResult
      * @throws Model\Exception\AccountException
@@ -167,11 +168,43 @@ class Util
     }
 
     /**
+     * Function update for a certificate
+     *
+     * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
+     *
+     * @param array $params
+     *
+     * @return AutoApplyResult
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
+    public function autoUpdateSSL($params)
+    {
+        // Two choices, we want url-encoded
+        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+
+        // Send request
+        $arr = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params,
+                                                           CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        // Successful
+        if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($arr);
+        }
+    }
+
+    /**
      * Function to revoke order
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $params
+     * @param array $params
      *
      * @return bool
      * @throws Model\Exception\AccountException
@@ -226,7 +259,7 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $params
+     * @param array $params
      *
      * @return bool
      * @throws Model\Exception\AccountException
@@ -248,6 +281,17 @@ class Util
         }
     }
 
+    /**
+     * @param array $params
+     *
+     * @return bool
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
     public function provideEVDetails($params)
     {
         // Response is always url encoded
@@ -266,7 +310,7 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $params
+     * @param array $params
      *
      * @return GetDCVEMailAddressListResult
      *
@@ -303,9 +347,10 @@ class Util
      *
      * https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/GetMDCDomainDetails%20v1.00.pdf
      *
-     * @param $params
+     * @param array $params
      *
-     * @return GetDCVEMailAddressListResult
+     * @return GetMDCDomainDetailsResult
+     *
      * @throws Model\Exception\AccountException
      * @throws Model\Exception\ArgumentException
      * @throws Model\Exception\CSRException
@@ -325,7 +370,7 @@ class Util
             $result
                 ->setDomainName($responseArray["1_domainName"])
                 ->setDcvMethod($responseArray["1_dcvMethod"])
-                ->setDcvStatus($responseArray["1_dvcStatus"]);
+                ->setDcvStatus($responseArray["1_dcvStatus"]);
 
             return $result;
         } else {
@@ -336,7 +381,7 @@ class Util
     /**
      * Function to enter the DCV code, coming from DCV E-Mail
      *
-     * @param $params
+     * @param array $params
      *
      * @return bool
      * @throws Model\Exception\UnknownException
