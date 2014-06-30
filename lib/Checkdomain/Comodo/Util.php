@@ -182,7 +182,7 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function autoUpdateSSL($params)
+    public function autoReplaceSSL($params)
     {
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
@@ -193,6 +193,11 @@ class Util
 
         // Successful
         if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
+            $result = new AutoApplyResult();
+
+            $result
+                ->setRequestQuery($arr['requestQuery']);
+
             return true;
         } else {
             throw $this->createException($arr);
