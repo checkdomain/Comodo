@@ -1,6 +1,11 @@
 README
 ======
 
+[![Build Status](https://travis-ci.org/checkdomain/Comodo.svg)](https://travis-ci.org/checkdomain/Comodo)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/checkdomain/Comodo/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/checkdomain/Ccomodo/?branch=master)
+[![Coverage Status](https://coveralls.io/repos/checkdomain/Comodo/badge.png)](https://coveralls.io/r/checkdomain/Comodo)
+
+
 What is Checkdomain/Comodo
 --------------------------
 Checkdomain/Comodo is a library to connect with the comodo SSL Api. It yet offers functions to apply, revoke certificates and to resend the DCV mail.
