@@ -41,7 +41,9 @@ class Util
     /**
      * Constructs the Util with a communicationAdapter
      *
-     * @param CommunicationAdapter $communicationAdapter
+     * @param CommunicationAdapter|null $communicationAdapter
+     * @param ImapWithSearch|null       $imapWithSearch
+     * @param ImapHelper|null           $imapHelper
      */
     public function __construct(CommunicationAdapter $communicationAdapter = null, ImapWithSearch $imapWithSearch = null, ImapHelper $imapHelper = null)
     {
@@ -50,13 +52,12 @@ class Util
         $this->imapHelper           = $imapHelper;
     }
 
-    /*
-     **
-     * @param CommunicationAdapter $client
+    /**
+     * @param CommunicationAdapter $communicationAdapter
      *
      * @return Util
      */
-    public function setCommunicationAdapter($communicationAdapter)
+    public function setCommunicationAdapter(CommunicationAdapter $communicationAdapter)
     {
         $this->communicationAdapter = $communicationAdapter;
 
@@ -134,14 +135,14 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function autoApplySSL($params)
+    public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_APPLY_URL, $params,
-                                                           CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this->getCommunicationAdapter()
+                    ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
         if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
@@ -182,14 +183,14 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function autoReplaceSSL($params)
+    public function autoReplaceSSL(array $params)
     {
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params,
-                                                           CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this->getCommunicationAdapter()
+                    ->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
         if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
@@ -218,13 +219,17 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function autoRevokeSSL($params)
+    public function autoRevokeSSL(array $params)
     {
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_REVOKE_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_AUTO_REVOKE_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_URL_ENCODED
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             return true;
@@ -238,7 +243,7 @@ class Util
      *
      * See documentation of params at https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/
      *
-     * @param $params
+     * @param array $params
      *
      * @return bool
      * @throws Model\Exception\AccountException
@@ -247,10 +252,14 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function autoUpdateDCV($params)
+    public function autoUpdateDCV(array $params)
     {
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_AUTO_UPDATE_DCV_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_AUTO_UPDATE_DCV_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_URL_ENCODED
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             return true;
@@ -273,11 +282,15 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function resendDCVEMail($params)
+    public function resendDCVEMail(array $params)
     {
         // Response is always url encoded
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_DCV_RESEND_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_DCV_RESEND_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_URL_ENCODED
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             return true;
@@ -297,11 +310,15 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function provideEVDetails($params)
+    public function provideEVDetails(array $params)
     {
         // Response is always url encoded
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_PROVIDE_EV_DETAILS_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_PROVIDE_EV_DETAILS_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_URL_ENCODED
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             return true;
@@ -325,11 +342,15 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function getDCVEMailAddressList($params)
+    public function getDCVEMailAddressList(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_DCV_MAIL_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_NEW_LINE);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_DCV_MAIL_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_NEW_LINE
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             $result = new GetDCVEMailAddressListResult();
@@ -363,11 +384,15 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function getMDCDomainDetails($params)
+    public function getMDCDomainDetails(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->getCommunicationAdapter()->sendToApi(self::COMODO_MDC_DOMAIN_DETAILS_URL, $params,
-                                                                     CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $responseArray = $this->getCommunicationAdapter()
+                              ->sendToApi(
+                                  self::COMODO_MDC_DOMAIN_DETAILS_URL,
+                                  $params,
+                                  CommunicationAdapter::RESPONSE_URL_ENCODED
+                              );
 
         if ($responseArray["errorCode"] == 0) {
             $result = new GetMDCDomainDetailsResult();
@@ -392,7 +417,7 @@ class Util
      * @throws Model\Exception\UnknownException
      * @throws Model\Exception\ArgumentException
      */
-    public function enterDCVCode($params)
+    public function enterDCVCode(array $params)
     {
         // Check parameters
         if (!isset($params["dcvCode"])) {
@@ -421,7 +446,7 @@ class Util
     /**
      * @param string   $domainName
      * @param null     $orderNumbers
-     * @param callable $callbackFunction
+     * @param \Closure $callbackFunction
      *
      * @return array
      */
@@ -439,13 +464,13 @@ class Util
 
         $search = array($orList . " " . $whereList);
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false,
-                                                  $callbackFunction);
+        return $this->getImapHelper()
+                    ->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false, $callbackFunction);
     }
 
     /**
      * @param bool     $markProcessed
-     * @param callable $callbackFunction
+     * @param \Closure $callbackFunction
      *
      * @return array
      */
@@ -455,28 +480,37 @@ class Util
             ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"'
         );
 
-        return $this->getImapHelper()->fetchMails($this->getImapWithSearch(), array(), $search, null, $markProcessed,
-                                                  true, $callbackFunction);
+        return $this->getImapHelper()
+                    ->fetchMails(
+                        $this->getImapWithSearch(),
+                        array(),
+                        $search,
+                        null,
+                        $markProcessed,
+                        true,
+                        $callbackFunction
+                    );
     }
 
     /**
      * Function to create an exception for API errorcodes
      *
-     * @param $responseArray
+     * @param array $responseArray
      *
      * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function createException($responseArray)
+    protected function createException(array $responseArray)
     {
-        $className = null;
-
         switch ($responseArray["errorCode"]) {
             case -1: // Not using https:
             case -17: // Wrong HTTP-method
-                return new RequestException($responseArray["errorCode"],
-                                            $responseArray["errorMessage"],
-                                            $responseArray["responseString"]);
-                break;
+                return new RequestException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["responseString"]
+                );
 
             case -2: // unrecognized argument
             case -3: // missing argument
@@ -485,17 +519,20 @@ class Util
             case -18: // Name = Fully-Qualified Domain Name
             case -35: // Name = = IP
             case -19: // Name = = Accessible IP
-                return new ArgumentException($responseArray["errorCode"],
-                                             $responseArray["errorMessage"],
-                                             $responseArray["errorItem"],
-                                             $responseArray["responseString"]);
-                break;
+                return new ArgumentException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["errorItem"],
+                    $responseArray["responseString"]
+                );
 
             case -16: // Permission denied
             case -15: // insufficient credits
-                return new AccountException($responseArray["errorCode"],
-                                            $responseArray["errorMessage"],
-                                            $responseArray["responseString"]);
+                return new AccountException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["responseString"]
+                );
 
             case -5: // contains wildcard
             case -6: // no wildcard, but must have
@@ -509,22 +546,25 @@ class Util
             case -21: // Already revoked
             case -26: // current being issued
             case -40: // key compromised
-                return new CSRException($responseArray["errorCode"],
-                                        $responseArray["errorMessage"],
-                                        $responseArray["responseString"]);
-                break;
+                return new CSRException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["responseString"]
+                );
 
             case -14:
-                return new UnknownApiException($responseArray["errorCode"],
-                                               $responseArray["errorMessage"],
-                                               $responseArray["responseString"]);
-                break;
+                return new UnknownApiException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["responseString"]
+                );
 
             default:
-                return new UnknownException($responseArray["errorCode"],
-                                            $responseArray["errorMessage"],
-                                            $responseArray["responseString"]);
-                break;
+                return new UnknownException(
+                    $responseArray["errorCode"],
+                    $responseArray["errorMessage"],
+                    $responseArray["responseString"]
+                );
         }
     }
 }

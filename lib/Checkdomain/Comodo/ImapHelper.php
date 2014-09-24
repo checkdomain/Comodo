@@ -28,22 +28,23 @@ class ImapHelper
     );
 
     public static $bodies = array(
-        'issued' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-üöä\.]* is attached!/'
+        'issued' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-ï¿½ï¿½ï¿½\.]* is attached!/'
     );
 
     /**
      *  Fetches the mail recursively, through the folders.
      *
-     * @param ImapWithSearch $imap imap helper class
-     * @param $messages (internal)
-     * @param $search               imap-searchterm
-     * @param Folder $folders the subfolders
-     * @param bool $markProcessed Sets the flag as processed
-     * @param bool $assume Assumes domainName / order-Number in the mail
+     * @param ImapWithSearch $imap             imap helper class
+     * @param array          $messages         (internal)
+     * @param string         $search           imap-searchterm
+     * @param Folder         $folders          the subfolders
+     * @param bool           $markProcessed    Sets the flag as processed
+     * @param bool           $assume           Assumes domainName / order-Number in the mail
+     * @param \Closure       $callbackFunction callback
      *
      * @return array
      */
-    public function fetchMails(ImapWithSearch $imap, $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
+    public function fetchMails(ImapWithSearch $imap, array $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
     {
         if ($folders === null) {
             $folders = $imap->getFolders();
@@ -93,8 +94,15 @@ class ImapHelper
                 }
             }
 
-            $messages = $this->fetchMails($imap, $messages, $search, $folder, $markProcessed, $assume,
-                                          $callbackFunction);
+            $messages = $this->fetchMails(
+                $imap,
+                $messages,
+                $search,
+                $folder,
+                $markProcessed,
+                $assume,
+                $callbackFunction
+            );
         }
 
         return $messages;
@@ -104,8 +112,8 @@ class ImapHelper
      * Marks the mail with the processed flag
      *
      * @param ImapWithSearch $imap
-     * @param Message $message
-     * @param integer $id
+     * @param Message        $message
+     * @param integer        $id
      */
     protected function markProcessed(ImapWithSearch $imap, Message $message, $id)
     {
@@ -119,9 +127,10 @@ class ImapHelper
      * Tries to find out, what Comodo wanna tell us...
      *
      * @param array $mail
+     *
      * @return null|string
      */
-    protected function getTypeOfMail($mail)
+    protected function getTypeOfMail(array $mail)
     {
         foreach (self::$subjects as $key => $subject) {
             if (stristr($mail['subject'], $subject) !== false) {
@@ -154,8 +163,7 @@ class ImapHelper
 
                 // Check for headers, to avoid exceptions
                 if ($subPart->getHeaders() != null) {
-                    if($subPart->isMultipart())
-                    {
+                    if ($subPart->isMultipart()) {
                         // Part is multipart as well
                         $tmp = $this->getPlainText($subPart);
                         $text = ($tmp != null) ? $tmp : $text;
@@ -240,11 +248,11 @@ class ImapHelper
                             } catch (\Exception $e) {
                             }
 
-                            $attachments[] =
-                                array('mime'     => $part->getHeaderField('Content-Type'),
-                                      'filename' => $part->getHeaderField('Content-Disposition', 'filename'),
-                                      'content'  => $content
-                                );
+                            $attachments[] = array(
+                                'mime'     => $part->getHeaderField('Content-Type'),
+                                'filename' => $part->getHeaderField('Content-Disposition', 'filename'),
+                                'content'  => $content
+                            );
                         }
                     }
                 }
@@ -255,7 +263,7 @@ class ImapHelper
     }
 
     /**
-     * @param $message
+     * @param string $message
      *
      * @return integer|null
      */
@@ -280,13 +288,13 @@ class ImapHelper
     }
 
     /**
-     * @param $message
+     * @param string $message
      *
      * @return string|null
      */
     protected function assumeDomainName($message)
     {
-        $pattern = '/(certificate|for|domain|domain name)+[\s\W]*(([a-z0-9\_\-äüöß\*]+\.){1,3}[a-z]{2,63})/i';
+        $pattern = '/(certificate|for|domain|domain name)+[\s\W]*(([a-z0-9\_\-Ã¤Ã¶Ã¼ÃŸ\*]+\.){1,3}[a-z]{2,63})/i';
         $matches = array();
         preg_match($pattern, $message['subject'], $matches);
 

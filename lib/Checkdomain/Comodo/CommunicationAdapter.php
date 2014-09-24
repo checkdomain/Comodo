@@ -49,16 +49,16 @@ class CommunicationAdapter
      *
      * @param Account $account
      */
-    public function __construct(Account $account) {
+    public function __construct(Account $account)
+    {
         $this->account = $account;
     }
 
-    /*
-    **
-    * @param \Guzzle\Http\Client $client
-    *
-    * @return Util
-    */
+    /**
+     * @param \Guzzle\Http\Client $client
+     *
+     * @return Util
+     */
     public function setClient($client)
     {
         $this->client = $client;
@@ -81,18 +81,18 @@ class CommunicationAdapter
     /**
      * Sends a query to the provided url and return the response body.
      *
-     * @param $url
-     * @param $params
+     * @param string $url
+     * @param array  $params
      *
      * @return string
      */
-    public function sendToWebsite($url, $params)
+    public function sendToWebsite($url, array $params)
     {
-        $url_encoded = http_build_query($params, '', '&');
+        $urlEncoded = http_build_query($params, '', '&');
 
         // Sending request
         $client  = $this->getClient();
-        $request = $client->post($url, null, $url_encoded);
+        $request = $client->post($url, null, $urlEncoded);
 
         $response = $request->send();
 
@@ -106,13 +106,13 @@ class CommunicationAdapter
     /**
      * Send a request to the comodo API, and decodes the response as given
      *
-     * @param $url
-     * @param $params
-     * @param int $responseType
+     * @param string $url
+     * @param array  $params
+     * @param int    $responseType
      *
      * @return array|bool
      */
-    public function sendToApi($url, $params, $responseType = self::RESPONSE_NEW_LINE)
+    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE)
     {
         if (!$this->preSendToApiCheck()) {
             return false;
@@ -141,6 +141,8 @@ class CommunicationAdapter
         } else if ($responseType == self::RESPONSE_URL_ENCODED) {
             return $this->decodeUrlEncodedResponse($responseString, $query);
         }
+
+        return false;
     }
 
     /**
@@ -165,7 +167,8 @@ class CommunicationAdapter
     /**
      * Decodes a responseString, separated by new lines and returns an response array
      *
-     * @param $responseString
+     * @param string $responseString
+     * @param string $requestQuery
      *
      * @return array
      */
@@ -195,9 +198,9 @@ class CommunicationAdapter
                     // if key already exists, open new array dimension
                     if (isset($responseArray[$key])) {
                         if (!is_array($responseArray[$key])) {
-                            $tmp_value             = $responseArray[$key];
+                            $tmpValue              = $responseArray[$key];
                             $responseArray[$key]   = array();
-                            $responseArray[$key][] = $tmp_value;
+                            $responseArray[$key][] = $tmpValue;
                         } else {
                             $responseArray[$key][] = $value;
                         }
@@ -221,7 +224,9 @@ class CommunicationAdapter
     /**
      * Decodes a responseString, encoded in query-string-format and returns an response array
      *
-     * @param $responseString
+     * @param string $responseString
+     * @param string $requestQuery
+     *
      * @return array
      */
     protected function decodeUrlEncodedResponse($responseString, $requestQuery)

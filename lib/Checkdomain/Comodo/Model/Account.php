@@ -16,7 +16,8 @@ class Account
      * @param string|null $loginName
      * @param string|null $loginPassword
      */
-    public function __construct($loginName = null, $loginPassword = null) {
+    public function __construct($loginName = null, $loginPassword = null)
+    {
         $this->setLoginName($loginName);
         $this->setLoginPassword($loginPassword);
     }

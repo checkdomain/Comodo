@@ -30,4 +30,3 @@ abstract class AbstractResult
         return $this->requestQuery;
     }
 }
-?>
