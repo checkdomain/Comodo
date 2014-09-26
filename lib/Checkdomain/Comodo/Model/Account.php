@@ -67,7 +67,7 @@ class Account
      */
     public function isValid()
     {
-        if ($this->getLoginName() == null || $this->getLoginPassword() == null) {
+        if ($this->getLoginName() === null || $this->getLoginPassword() === null) {
             return false;
         }
 

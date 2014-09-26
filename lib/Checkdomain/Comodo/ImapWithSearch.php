@@ -15,12 +15,13 @@ class ImapWithSearch extends Imap
     /**
     * Gives access to the search function
     *
-    * @param array $params
+    * @param $params
     *
     * @return array message ids
     */
-    public function search(array $params)
+    public function search($params)
     {
-        return $this->protocol->search($params);
+        // For the search function, it must have the ability to send non-arrays
+         return $this->protocol->search($params);
     }
 }

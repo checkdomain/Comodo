@@ -9,11 +9,9 @@ use Checkdomain\Comodo\Model\Exception\UnknownApiException;
 use Checkdomain\Comodo\Model\Exception\UnknownException;
 
 use Checkdomain\Comodo\Model\Result\AutoApplyResult;
+use Checkdomain\Comodo\Model\Result\AutoReplaceResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
-
-use Zend\Mail\Storage\Folder;
-use Zend\Mail\Storage\Message;
 
 /**
  * Class Util
@@ -30,7 +28,7 @@ class Util
     const COMODO_AUTO_UPDATE_DCV_URL    = "https://secure.comodo.net/products/!AutoUpdateDCV";
     const COMODO_PROVIDE_EV_DETAILS_URL = "https://secure.comodo.net/products/!ProvideEVDetails";
     const COMODO_MDC_DOMAIN_DETAILS_URL = "https://secure.comodo.net/products/!GetMDCDomainDetails";
-    const COMODO_AUTO_REPLACE_URL        = "https://secure.comodo.net/products/!AutoReplaceSSL";
+    const COMODO_AUTO_REPLACE_URL       = "https://secure.comodo.net/products/!AutoReplaceSSL";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -45,79 +43,11 @@ class Util
      * @param ImapWithSearch|null       $imapWithSearch
      * @param ImapHelper|null           $imapHelper
      */
-    public function __construct(CommunicationAdapter $communicationAdapter = null, ImapWithSearch $imapWithSearch = null, ImapHelper $imapHelper = null)
+    public function __construct(CommunicationAdapter $communicationAdapter, ImapWithSearch $imapWithSearch, ImapHelper $imapHelper)
     {
         $this->communicationAdapter = $communicationAdapter;
         $this->imapWithSearch       = $imapWithSearch;
         $this->imapHelper           = $imapHelper;
-    }
-
-    /**
-     * @param CommunicationAdapter $communicationAdapter
-     *
-     * @return Util
-     */
-    public function setCommunicationAdapter(CommunicationAdapter $communicationAdapter)
-    {
-        $this->communicationAdapter = $communicationAdapter;
-
-        return $this;
-    }
-
-    /**
-     * @return CommunicationAdapter
-     */
-    public function getCommunicationAdapter()
-    {
-        if ($this->communicationAdapter == null) {
-            $this->communicationAdapter = new CommunicationAdapter();
-        }
-
-        return $this->communicationAdapter;
-    }
-
-    /**
-     * @param ImapHelper $imapHelper
-     *
-     * @return Util
-     */
-    public function setImapHelper(ImapHelper $imapHelper)
-    {
-        $this->imapHelper = $imapHelper;
-
-        return $this;
-    }
-
-    /**
-     * @return ImapHelper
-     */
-    public function getImapHelper()
-    {
-        if ($this->imapHelper == null) {
-            $this->imapHelper = new ImapHelper();
-        }
-
-        return $this->imapHelper;
-    }
-
-    /**
-     * @param ImapWithSearch $imapWithSearch
-     *
-     * @return Util
-     */
-    public function setImapWithSearch(ImapWithSearch $imapWithSearch)
-    {
-        $this->imapWithSearch = $imapWithSearch;
-
-        return $this;
-    }
-
-    /**
-     * @return ImapWithSearch
-     */
-    public function getImapWithSearch()
-    {
-        return $this->imapWithSearch;
     }
 
     /**
@@ -141,7 +71,7 @@ class Util
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->getCommunicationAdapter()
+        $arr = $this->communicationAdapter
                     ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
@@ -189,17 +119,18 @@ class Util
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->getCommunicationAdapter()
-                    ->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this->communicationAdapter
+            ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
-        if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
-            $result = new AutoApplyResult();
+        if ($arr["errorCode"] == 0) {
+            $result = new AutoReplaceResult();
 
             $result
-                ->setRequestQuery($arr['requestQuery']);
+                ->setCertificateID($arr["certificateID"])
+                ->setExpectedDeliveryTime($arr["expectedDeliveryTime"]);
 
-            return true;
+            return $result;
         } else {
             throw $this->createException($arr);
         }
@@ -221,21 +152,10 @@ class Util
      */
     public function autoRevokeSSL(array $params)
     {
-        // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
-
-        $responseArray = $this->getCommunicationAdapter()
-                              ->sendToApi(
-                                  self::COMODO_AUTO_REVOKE_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_URL_ENCODED
-                              );
-
-        if ($responseArray["errorCode"] == 0) {
-            return true;
-        } else {
-            throw $this->createException($responseArray);
-        }
+        return $this->sendBooleanRequest(self::COMODO_AUTO_REVOKE_URL,
+                                         $params,
+                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
     }
 
     /**
@@ -254,18 +174,10 @@ class Util
      */
     public function autoUpdateDCV(array $params)
     {
-        $responseArray = $this->getCommunicationAdapter()
-                              ->sendToApi(
-                                  self::COMODO_AUTO_UPDATE_DCV_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_URL_ENCODED
-                              );
-
-        if ($responseArray["errorCode"] == 0) {
-            return true;
-        } else {
-            throw $this->createException($responseArray);
-        }
+        return $this->sendBooleanRequest(self::COMODO_AUTO_UPDATE_DCV_URL,
+                                         $params,
+                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
     }
 
     /**
@@ -284,19 +196,10 @@ class Util
      */
     public function resendDCVEMail(array $params)
     {
-        // Response is always url encoded
-        $responseArray = $this->getCommunicationAdapter()
-                              ->sendToApi(
-                                  self::COMODO_DCV_RESEND_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_URL_ENCODED
-                              );
-
-        if ($responseArray["errorCode"] == 0) {
-            return true;
-        } else {
-            throw $this->createException($responseArray);
-        }
+        return $this->sendBooleanRequest(self::COMODO_DCV_RESEND_URL,
+                                         $params,
+                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
     }
 
     /**
@@ -312,19 +215,10 @@ class Util
      */
     public function provideEVDetails(array $params)
     {
-        // Response is always url encoded
-        $responseArray = $this->getCommunicationAdapter()
-                              ->sendToApi(
-                                  self::COMODO_PROVIDE_EV_DETAILS_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_URL_ENCODED
-                              );
-
-        if ($responseArray["errorCode"] == 0) {
-            return true;
-        } else {
-            throw $this->createException($responseArray);
-        }
+        return $this->sendBooleanRequest(self::COMODO_PROVIDE_EV_DETAILS_URL,
+                                         $params,
+                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
     }
 
     /**
@@ -345,7 +239,7 @@ class Util
     public function getDCVEMailAddressList(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->getCommunicationAdapter()
+        $responseArray = $this->communicationAdapter
                               ->sendToApi(
                                   self::COMODO_DCV_MAIL_URL,
                                   $params,
@@ -387,7 +281,7 @@ class Util
     public function getMDCDomainDetails(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->getCommunicationAdapter()
+        $responseArray = $this->communicationAdapter
                               ->sendToApi(
                                   self::COMODO_MDC_DOMAIN_DETAILS_URL,
                                   $params,
@@ -429,17 +323,46 @@ class Util
         }
 
         // this is not a official request, so we need to use the website
-        $responseString = $this->getCommunicationAdapter()->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
+        $responseString = $this->communicationAdapter->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
 
         // Decode answer from website
-        if (stristr($responseString, "You have entered the correct Domain Control Validation code") != false) {
+        if (stristr($responseString, "You have entered the correct Domain Control Validation code") !== false) {
             return true;
-        } else if (stristr($responseString, 'the certificate has already been issued') != false) {
+        } else if (stristr($responseString, 'the certificate has already been issued') !== false) {
             throw new ArgumentException(-104, 'The certificate has already been issued', 'certificate', $responseString);
-        } else if (stristr($responseString, 'Invalid Validation Code!') != false) {
+        } else if (stristr($responseString, 'Invalid Validation Code!') !== false) {
             throw new ArgumentException(-103, 'Invalid Validation Code', 'validation-code', $responseString);
         } else {
             throw new UnknownException(99, 'UnknownException', $responseString);
+        }
+    }
+
+    /**
+     * @param string $url
+     * @param array  $params
+     * @param int    $type
+     *
+     * @return bool
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     */
+    protected function sendBooleanRequest($url, array $params, $type){
+        // Response is always url encoded
+        $responseArray = $this->communicationAdapter
+            ->sendToApi(
+                $url,
+                $params,
+                $type
+            );
+
+        if ($responseArray["errorCode"] == 0) {
+            return true;
+        } else {
+            throw $this->createException($responseArray);
         }
     }
 
@@ -456,16 +379,18 @@ class Util
         $whereList = ' BODY "' . $domainName . '"';
         $whereList .= ' SUBJECT "' . $domainName . '"';
 
-        foreach ($orderNumbers as $orderNumber) {
-            $orList .= ' OR OR ';
-            $whereList .= ' BODY "' . $orderNumber . '"';
-            $whereList .= ' SUBJECT "' . $orderNumber . '"';
+        if (is_array($orderNumbers)) {
+            foreach ($orderNumbers as $orderNumber) {
+                $orList .= ' OR OR ';
+                $whereList .= ' BODY "' . $orderNumber . '"';
+                $whereList .= ' SUBJECT "' . $orderNumber . '"';
+            }
         }
 
-        $search = array($orList . " " . $whereList);
+        $search = $orList . " " . $whereList;
 
-        return $this->getImapHelper()
-                    ->fetchMails($this->getImapWithSearch(), array(), $search, null, false, false, $callbackFunction);
+        return $this->imapHelper
+                    ->fetchMails($this->imapWithSearch, array(), $search, null, false, false, $callbackFunction);
     }
 
     /**
@@ -476,13 +401,11 @@ class Util
      */
     public function getUnprocessedMails($markProcessed = true, \Closure $callbackFunction = null)
     {
-        $search = array(
-            ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"'
-        );
+        $search = ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"';
 
-        return $this->getImapHelper()
+        return $this->imapHelper
                     ->fetchMails(
-                        $this->getImapWithSearch(),
+                        $this->imapWithSearch,
                         array(),
                         $search,
                         null,

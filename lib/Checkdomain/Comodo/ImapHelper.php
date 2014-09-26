@@ -1,11 +1,9 @@
 <?php
 namespace Checkdomain\Comodo;
 
-use Zend\Mail\Storage\Imap;
 use Zend\Mail\Storage\Message;
 use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Part;
-use Zend\Mime\Decode;
 
 /**
  * Class ImapHelper
@@ -21,14 +19,12 @@ class ImapHelper
         'confirmation'         => 'CONFIRMATION',
         'information_required' => 'Information Required',
         '1_expiry'             => 'Customer certificate expiry warning (1 days)',
-        '7_expiry'             => 'Customer certificate expiry warning (7 days)',
-        '14_expiry'            => 'Customer certificate expiry warning (14 days)',
         '30_expiry'            => 'Customer certificate expiry warning (30 days)',
         '60_expiry'            => 'Customer certificate expiry warning (60 days)'
     );
 
     public static $bodies = array(
-        'issued' => '/Your [a-zA-Z ]* Certificate for [a-zA-Z0-9\_\-���\.]* is attached!/'
+        'issued' => '/Your [a-zA-Z ]* Certificate for [\*a-zA-Z0-9\_\-öäü\.]* is attached!/'
     );
 
     /**
@@ -52,32 +48,33 @@ class ImapHelper
 
         foreach ($folders as $folder) {
             $imap->selectFolder($folder);
-            $result = $imap->search($search);
+            $result = $imap->search(array($search));
 
             foreach ($result as $id) {
                 $i = count($messages);
 
                 $message = $imap->getMessage($id);
 
+
                 $messages[$i]['id']     = $i;
                 $messages[$i]['folder'] = $folder;
 
                 // Zend-mail sometimes got problems, with incorrect e-mails
                 try {
-                    $messages[$i]['subject'] = utf8_decode($message->subject);
+                    $messages[$i]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
                 } catch (\Exception $e) {
                     $messages[$i]['subject'] = '-No subject-';
                 }
 
                 try {
-                    $messages[$i]['received'] = strtotime($message->date);
+                    $messages[$i]['received'] = strtotime($message->getHeader('date', 'string'));
                 } catch (\Exception $e) {
                     $messages[$i]['received'] = '-No date-';
                 }
 
-                $messages[$i]['plainText'] = $this->getPlainText($message);
+                $messages[$i]['plainText']   = $this->getPlainText($message);
                 $messages[$i]['attachments'] = $this->getAttachments($message);
-                $messages[$i]['type']      = $this->getTypeOfMail($messages[$i]);
+                $messages[$i]['type']        = $this->getTypeOfMail($messages[$i]);
 
                 if ($assume) {
                     $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
@@ -157,20 +154,22 @@ class ImapHelper
         $text = null;
 
         if ($part->isMultipart()) {
+            $partCount = $part->countParts();
+
             // Parse all parts
-            for ($i = 0; $i < $part->countParts(); $i++) {
+            for ($i = 0; $i < $partCount; $i++) {
                 $subPart = $part->getPart($i + 1);
 
                 // Check for headers, to avoid exceptions
-                if ($subPart->getHeaders() != null) {
+                if ($subPart->getHeaders() !== null) {
                     if ($subPart->isMultipart()) {
                         // Part is multipart as well
                         $tmp = $this->getPlainText($subPart);
-                        $text = ($tmp != null) ? $tmp : $text;
+                        $text = ($tmp !== null) ? $tmp : $text;
                     } else {
                         // Try to get plain/text of this content
                         $tmp = $this->getPlainTextOfPart($subPart);
-                        $text = ($tmp != null) ? $tmp : $text;
+                        $text = ($tmp !== null) ? $tmp : $text;
                     }
                 }
             }
@@ -179,13 +178,13 @@ class ImapHelper
             $text = $this->getPlainTextOfPart($part);
         }
 
-        return quoted_printable_decode(strip_tags($text));
+        return $text;
     }
 
     /**
      * @param Part $part
      *
-     * @return null|Part
+     * @return null|string
      */
     private function getPlainTextOfPart(Part $part)
     {
@@ -194,19 +193,40 @@ class ImapHelper
                 return null;
             }
         } catch (\Exception $e) {
+            // Zend throws an Exception, if headerField does not exist
         }
 
         try {
             // If content-type is text/plain, return its content
             if ($part->getHeaderField('Content-Type') == 'text/plain') {
-                return $part;
+                return $this->getStringFromPart($part);
             }
         } catch (\Exception $e) {
             // If content-type is not available (exception thrown), return its content
-            return $part;
+            return $this->getStringFromPart($part);
         }
 
         return null;
+    }
+
+    /**
+     * @param $part
+     *
+     * @return null|string
+     */
+    public function getStringFromPart($part)
+    {
+        if ($part === null) {
+            return null;
+        }
+
+        if ($part instanceof Part) {
+            $text = $part->getContent();
+        } else {
+            $text = $part;
+        }
+
+        return quoted_printable_decode(strip_tags($text));
     }
 
 
@@ -222,17 +242,19 @@ class ImapHelper
         // Only multi-part will have attachments
         if ($message->isMultipart()) {
             if ($message->countParts() > 1) {
-                for ($i = 0; $i < $message->countParts(); $i++) {
+
+                $partCount = $message->countParts();
+                for ($i = 0; $i < $partCount; $i++) {
                     $part = $message->getPart($i + 1);
 
                     // Check for headers, to avoid exceptions
-                    if ($part->getHeaders() != null) {
-
+                    if ($part->getHeaders() !== null) {
                         // Getting disposition
                         $disposition = null;
                         try {
                             $disposition = $part->getHeaderField('Content-Disposition');
                         } catch (\Exception $e) {
+                            // Zend throws an Exception, if headerField does not exist
                         }
 
                         if ($disposition == 'attachment') {
@@ -246,6 +268,7 @@ class ImapHelper
                                     $content = base64_decode($content);
                                 }
                             } catch (\Exception $e) {
+                                // Zend throws an Exception, if headerField does not exist
                             }
 
                             $attachments[] = array(
@@ -270,21 +293,8 @@ class ImapHelper
     protected function assumeOrderNumber($message)
     {
         $pattern = '/[order|\#][^0-9]+([0-9]{7,8})/i';
-        $matches = array();
-        preg_match($pattern, $message['subject'], $matches);
 
-        if (!empty($matches[1])) {
-            return $matches[1];
-        }
-
-        $matches = array();
-        preg_match($pattern, $message['plainText'], $matches);
-
-        if (!empty($matches[1])) {
-            return $matches[1];
-        }
-
-        return null;
+        return $this->searchSubjectAndPlainText($pattern, $message);
     }
 
     /**
@@ -294,19 +304,31 @@ class ImapHelper
      */
     protected function assumeDomainName($message)
     {
-        $pattern = '/(certificate|for|domain|domain name)+[\s\W]*(([a-z0-9\_\-äöüß\*]+\.){1,3}[a-z]{2,63})/i';
-        $matches = array();
-        preg_match($pattern, $message['subject'], $matches);
+        $pattern = '/(?:certificate for|domain|domain name){1}[\s\t\n\r\:\-]*((?:[\*a-z0-9äöüß-]+\.)+[a-z0-9äöüß-]+)/i';
 
-        if (!empty($matches[3])) {
-            return $matches[3];
+        return $this->searchSubjectAndPlainText($pattern, $message);
+    }
+
+    /**
+     * @param $pattern
+     * @param $message
+     *
+     * @return null
+     */
+    protected function searchSubjectAndPlainText($pattern, $message)
+    {
+        $matchesText = array();
+        preg_match($pattern, $message['subject'], $matchesText);
+
+        if (!empty($matchesText[1])) {
+            return $matchesText[1];
         }
 
-        $matches = array();
-        preg_match($pattern, $message['plainText'], $matches);
+        $matchesSubject = array();
+        preg_match($pattern, $message['plainText'], $matchesSubject);
 
-        if (!empty($matches[3])) {
-            return $matches[3];
+        if (!empty($matchesSubject[1])) {
+            return $matchesSubject[1];
         }
 
         return null;

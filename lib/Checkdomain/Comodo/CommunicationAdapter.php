@@ -49,7 +49,7 @@ class CommunicationAdapter
      *
      * @param Account $account
      */
-    public function __construct(Account $account)
+    public function __construct(Account $account = null)
     {
         $this->account = $account;
     }
@@ -71,7 +71,7 @@ class CommunicationAdapter
      */
     public function getClient()
     {
-        if ($this->client == null) {
+        if ($this->client === null) {
             $this->client = new Client();
         }
 
@@ -114,9 +114,7 @@ class CommunicationAdapter
      */
     public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE)
     {
-        if (!$this->preSendToApiCheck()) {
-            return false;
-        }
+        $this->preSendToApiCheck();
 
         // Merging post-data
         $fields                  = array();
@@ -138,11 +136,9 @@ class CommunicationAdapter
         // Decoding and returning response
         if ($responseType == self::RESPONSE_NEW_LINE) {
             return $this->decodeNewLineEncodedResponse($responseString, $query);
-        } else if ($responseType == self::RESPONSE_URL_ENCODED) {
+        } else {
             return $this->decodeUrlEncodedResponse($responseString, $query);
         }
-
-        return false;
     }
 
     /**
@@ -153,7 +149,7 @@ class CommunicationAdapter
      */
     protected function preSendToApiCheck()
     {
-        if ($this->getAccount() == null) {
+        if ($this->getAccount() === null) {
             throw new \Exception("Please provided an account");
         }
 
@@ -182,6 +178,7 @@ class CommunicationAdapter
 
         $responseArray = array();
 
+
         // Valid answer?
         if (is_numeric($status)) {
             // Successful?
@@ -189,7 +186,10 @@ class CommunicationAdapter
                 $responseArray["errorCode"]    = $status;
                 $responseArray["errorMessage"] = trim($parts[1]);
             } else {
-                for ($i = 1; $i < count($parts); $i++) {
+                $responseArray["errorCode"]    = $status;
+
+                $partCount = count($parts);
+                for ($i = 1; $i < $partCount; $i++) {
                     $tmp = preg_split("/[\s\t]+/", $parts[$i], 2);
 
                     $key   = trim($tmp[0]);
@@ -201,6 +201,7 @@ class CommunicationAdapter
                             $tmpValue              = $responseArray[$key];
                             $responseArray[$key]   = array();
                             $responseArray[$key][] = $tmpValue;
+                            $responseArray[$key][] = $value;
                         } else {
                             $responseArray[$key][] = $value;
                         }
@@ -237,6 +238,11 @@ class CommunicationAdapter
 
         $responseArray["responseString"] = $responseString;
         $responseArray["requestQuery"]   = $requestQuery;
+
+        if(!isset($responseArray['errorCode'])) {
+            $responseArray['errorCode'] = 99;
+            $responseArray['errorMessage'] = $responseString;
+        }
 
         return $responseArray;
     }

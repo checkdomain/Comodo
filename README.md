@@ -4,6 +4,7 @@ README
 [![Build Status](https://travis-ci.org/checkdomain/Comodo.svg)](https://travis-ci.org/checkdomain/Comodo)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/checkdomain/Comodo/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/checkdomain/Comodo/?branch=master)
 [![Coverage Status](https://coveralls.io/repos/checkdomain/Comodo/badge.png)](https://coveralls.io/r/checkdomain/Comodo)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/3119495f-5473-4396-9c36-0151add717e9/mini.png)](https://insight.sensiolabs.com/projects/3119495f-5473-4396-9c36-0151add717e9)
 
 
 What is Checkdomain/Comodo
@@ -27,7 +28,7 @@ The easiest way to install this library is through [composer](http://getcomposer
    "require": {
         "checkdomain/comodo": "dev-master"
     }
-}+
+}
 ```
 Another way would be to download this library and configure the autoloading yourself. This library relies on a [PSR-0](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-0.md) compatible autoloader for automatic class loading.
 
