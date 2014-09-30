@@ -152,6 +152,9 @@ class Util
      */
     public function autoRevokeSSL(array $params)
     {
+        // Two choices, we want url-encoded
+        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+
         return $this->sendBooleanRequest(self::COMODO_AUTO_REVOKE_URL,
                                          $params,
                                          CommunicationAdapter::RESPONSE_URL_ENCODED
