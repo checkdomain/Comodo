@@ -120,7 +120,7 @@ class Util
 
         // Send request
         $arr = $this->communicationAdapter
-            ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+            ->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
         if ($arr["errorCode"] == 0) {
