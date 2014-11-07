@@ -213,88 +213,22 @@ class Util
         if ($arr["errorCode"] >= 0) {
             $result = new CollectSslResult();
 
-            print_r($arr);
+            foreach($arr as $key => $value) {
+                if($key == 'notBefore' || $key == 'notAfter') {
+                    $value = new \DateTime('@' . $value);
+                }
 
-            if(isset($arr['caCertificate'])) {
-                $result->setCaCertificate($arr['caCertificate']);
+                $function = 'set' . ucfirst($key);
+
+                // For example setErrorCode does not exists, so check before
+                if(method_exists($result, $function)) {
+
+                    call_user_func(array($result, $function), $value);
+                }
             }
-
-            if(isset($arr['certificate'])) {
-                $result->setCertificate($arr['certificate']);
-            }
-
-            if(isset($arr['certificateStatus'])) {
-                $result->setCertificateStatus($arr['certificateStatus']);
-             }
-
-            if(isset($arr['csrStatus'])) {
-                $result->setCsrStatus($arr['csrStatus']);
-             }
-
-            if(isset($arr['dcvStatus'])) {
-                $result->setDcvStatus($arr['dcvStatus']);
-            }
-
-            if(isset($arr['evClickThroughStatus'])) {
-                $result->setEvClickThroughStatus($arr['evClickThroughStatus']);
-            }
-
-            if(isset($arr['fqdn'])) {
-                $result->setFqdn($arr['fqdn']);
-            }
-
-            if(isset($arr['freeDVUPStatus'])) {
-                $result->setFreeDVUPStatus($arr['freeDVUPStatus']);
-            }
-
-            if(isset($arr['mdcDomainDetails'])) {
-                $result->setMdcDomainDetails($arr['mdcDomainDetails']);
-             }
-
-            if(isset($arr['mdcDomainDetails2'])) {
-                $result->setMdcDomainDetails2($arr['mdcDomainDetails2']);
-            }
-
-            if(isset($arr['netscapeCertificateSequence'])) {
-                $result->setNetscapeCertificateSequence($arr['netscapeCertificateSequence']);
-            }
-
-            if(isset($arr['notAfter'])) {
-                $result->setNotAfter(new \DateTime('@' . $arr['notAfter']));
-            }
-
-            if(isset($arr['notBefore'])) {
-                $result->setNotBefore(new \DateTime('@' . $arr['notBefore']));
-            }
-
-            if(isset($arr['orderNumber'])) {
-                $result->setOrderNumber($arr['orderNumber']);
-            }
-
-            if(isset($arr['organizationValidationStatus'])) {
-                $result->setOrganizationValidationStatus($arr['organizationValidationStatus']);
-            }
-
-            if(isset($arr['ovCallBackStatus'])) {
-                $result->setOvCallBackStatus($arr['ovCallBackStatus']);
-            }
-
-            if(isset($arr['pkcs7'])) {
-                $result->setPkcs7($arr['pkcs7']);
-            }
-
-            if(isset($arr['validationStatus'])) {
-                $result->setValidationStatus($arr['validationStatus']);
-            }
-
-            if(isset($arr['zipFile'])) {
-                $result->setZipFile($arr['zipFile']);
-            }
-
 
             return $result;
         } else {
-            print_R($arr);die();
             throw $this->createException($arr);
         }
     }

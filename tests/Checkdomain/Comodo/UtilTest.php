@@ -316,14 +316,31 @@ class UtilTest extends AbstractTest
     /**
      * test, for getting status of certificate
      */
-    public function testCollectSsl()
+    public function testCollectSslStatus()
     {
         $responseText = 'errorCode=1&orderNumber=12345678&certificateStatus=Issued';
 
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
-        $object = $util->collectSsl(array());
+        $object = $util->collectSsl(array('showExtStatus' => 'Y'));
 
         $this->assertEquals('Issued', $object->getCertificateStatus());
     }
+
+    /**
+     * test, for getting period of certificate
+     */
+    public function testCollectSslPeriod()
+    {
+        $responseText = 'errorCode=1&orderNumber=12345678&notBefore=1388576001&notAfter=1420112001';
+
+        $util = $this->createUtil($this->createGuzzleClient($responseText));
+
+        $object = $util->collectSsl(array());
+
+        $this->assertEquals('01.01.2014', $object->getNotBefore()->format('d.m.Y') );
+        $this->assertEquals('01.01.2015', $object->getNotAfter()->format('d.m.Y') );
+    }
+
+
 }
