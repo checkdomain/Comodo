@@ -213,19 +213,7 @@ class Util
         if ($arr["errorCode"] >= 0) {
             $result = new CollectSslResult();
 
-            foreach($arr as $key => $value) {
-                if($key == 'notBefore' || $key == 'notAfter') {
-                    $value = new \DateTime('@' . $value);
-                }
-
-                $function = 'set' . ucfirst($key);
-
-                // For example setErrorCode does not exists, so check before
-                if(method_exists($result, $function)) {
-
-                    call_user_func(array($result, $function), $value);
-                }
-            }
+            $this->fill($result, $arr, array('notBefore', 'notAfter'));
 
             return $result;
         } else {
@@ -233,7 +221,29 @@ class Util
         }
     }
 
+    /**
+     * @param       $object
+     * @param array $arr
+     * @param array $timestampFields
+     *
+     * @return $this
+     */
+    protected function fill($object, array $arr, array $timestampFields = array()) {
+        foreach($arr as $key => $value) {
+            if(in_array($key, $timestampFields)) {
+                $value = new \DateTime('@' . $value);
+            }
 
+            $function = 'set' . ucfirst($key);
+
+            // For example setErrorCode does not exists, so check before
+            if(method_exists($object, $function)) {
+                call_user_func(array($object, $function), $value);
+            }
+        }
+
+        return $this;
+    }
 
     /**
      * Function to resend the DCV Email
