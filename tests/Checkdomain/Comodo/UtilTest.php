@@ -200,7 +200,7 @@ class UtilTest extends AbstractTest
     }
 
     /**
-     * return the current status auf DCV
+     * test for getting current dcv method
      */
     public function testGetMdcDomainDetails()
     {
@@ -210,7 +210,7 @@ class UtilTest extends AbstractTest
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
         $params = array(
-            'orderNumber'     => '1234567',
+            'orderNumber' => '1234567',
         );
 
         $object = $util->getMDCDomainDetails($params);
@@ -223,6 +223,7 @@ class UtilTest extends AbstractTest
     }
 
     /**
+     * test, if request-string is correctly formatted
      */
     public function testCheckRequestString()
     {
@@ -310,5 +311,19 @@ class UtilTest extends AbstractTest
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
         $util->autoApplySSL(array());
+    }
+
+    /**
+     * test, for getting status of certificate
+     */
+    public function testCollectSsl()
+    {
+        $responseText = 'errorCode=1&orderNumber=12345678&certificateStatus=Issued';
+
+        $util = $this->createUtil($this->createGuzzleClient($responseText));
+
+        $object = $util->collectSsl(array());
+
+        $this->assertEquals('Issued', $object->getCertificateStatus());
     }
 }
