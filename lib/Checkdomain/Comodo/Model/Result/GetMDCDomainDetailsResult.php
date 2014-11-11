@@ -10,6 +10,12 @@ namespace Checkdomain\Comodo\Model\Result;
 class GetMDCDomainDetailsResult extends AbstractResult
 {
     /**
+     * Status for being validated
+     */
+    const DCV_VALIDATED = 'Validated';
+
+
+    /**
      * @var string
      */
     protected $domainName;
