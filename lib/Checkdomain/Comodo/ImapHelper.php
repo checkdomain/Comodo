@@ -86,8 +86,15 @@ class ImapHelper
                         $success = $callbackFunction($id, $messages[$i]);
                     }
                 } catch(\Exception $e) {
+                    // General decoding error -> removeMessage
                     unset($messages[$i]);
-                    // General decoding error -> skip
+
+                    // Always mark as processed
+                    $success = true;
+                }
+
+                if ($markProcessed && $success) {
+                    $this->markProcessed($imap, $message, $id);
                 }
             }
 
