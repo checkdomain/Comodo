@@ -14,7 +14,6 @@ class GetMDCDomainDetailsResult extends AbstractResult
      */
     const DCV_VALIDATED = 'Validated';
 
-
     /**
      * @var string
      */

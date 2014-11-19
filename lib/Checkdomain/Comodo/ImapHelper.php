@@ -53,37 +53,40 @@ class ImapHelper
             foreach ($result as $id) {
                 $i = count($messages);
 
-                $message = $imap->getMessage($id);
-
-
-                $messages[$i]['id']     = $i;
-                $messages[$i]['folder'] = $folder;
-
-                // Zend-mail sometimes got problems, with incorrect e-mails
                 try {
-                    $messages[$i]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
-                } catch (\Exception $e) {
-                    $messages[$i]['subject'] = '-No subject-';
-                }
+                    $message = $imap->getMessage($id);
 
-                try {
-                    $messages[$i]['received'] = strtotime($message->getHeader('date', 'string'));
-                } catch (\Exception $e) {
-                    $messages[$i]['received'] = '-No date-';
-                }
+                    $messages[$i]['id']     = $i;
+                    $messages[$i]['folder'] = $folder;
 
-                $messages[$i]['plainText']   = $this->getPlainText($message);
-                $messages[$i]['attachments'] = $this->getAttachments($message);
-                $messages[$i]['type']        = $this->getTypeOfMail($messages[$i]);
+                    // Zend-mail sometimes got problems, with incorrect e-mails
+                    try {
+                        $messages[$i]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
+                    } catch (\Exception $e) {
+                        $messages[$i]['subject'] = '-No subject-';
+                    }
 
-                if ($assume) {
-                    $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
-                    $messages[$i]['domainName']  = $this->assumeDomainName($messages[$i]);
-                }
+                    try {
+                        $messages[$i]['received'] = strtotime($message->getHeader('date', 'string'));
+                    } catch (\Exception $e) {
+                        $messages[$i]['received'] = '-No date-';
+                    }
 
-                $success = true;
-                if (is_callable($callbackFunction)) {
-                    $success = $callbackFunction($id, $messages[$i]);
+                    $messages[$i]['plainText']   = $this->getPlainText($message);
+                    $messages[$i]['attachments'] = $this->getAttachments($message);
+                    $messages[$i]['type']        = $this->getTypeOfMail($messages[$i]);
+
+                    if ($assume) {
+                        $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
+                        $messages[$i]['domainName']  = $this->assumeDomainName($messages[$i]);
+                    }
+
+                    $success = true;
+                    if (is_callable($callbackFunction)) {
+                        $success = $callbackFunction($id, $messages[$i]);
+                    }
+                } catch(\Exception $e) {
+                    // General decoding error -> skip
                 }
 
                 if ($markProcessed && $success) {
