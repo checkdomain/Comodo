@@ -85,12 +85,12 @@ class ImapHelper
                     if (is_callable($callbackFunction)) {
                         $success = $callbackFunction($id, $messages[$i]);
                     }
+
+                    if ($markProcessed && $success) {
+                        $this->markProcessed($imap, $message, $id);
+                    }
                 } catch(\Exception $e) {
                     // General decoding error -> skip
-                }
-
-                if ($markProcessed && $success) {
-                    $this->markProcessed($imap, $message, $id);
                 }
             }
 
