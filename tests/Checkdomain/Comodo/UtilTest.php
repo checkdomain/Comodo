@@ -5,6 +5,7 @@ use Checkdomain\Comodo\CommunicationAdapter;
 use Checkdomain\Comodo\ImapHelper;
 use Checkdomain\Comodo\ImapWithSearch;
 use Checkdomain\Comodo\Model\Account;
+use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
 use Checkdomain\Comodo\Util;
 use Guzzle\Http\Client;
 
@@ -325,6 +326,21 @@ class UtilTest extends AbstractTest
         $object = $util->collectSsl(array('showExtStatus' => 'Y'));
 
         $this->assertEquals('Issued', $object->getCertificateStatus());
+    }
+
+
+    /**
+     * test, for getting status of certificate
+     */
+    public function testUpdateUserEvClickThrough()
+    {
+        $responseText = 'errorCode=0&status=1';
+
+        $util = $this->createUtil($this->createGuzzleClient($responseText));
+
+        $object = $util->updateUserEvClickThrough(array());
+
+        $this->assertEquals(1, $object->getStatus());
     }
 
     /**

@@ -13,6 +13,7 @@ use Checkdomain\Comodo\Model\Result\AutoReplaceResult;
 use Checkdomain\Comodo\Model\Result\CollectSslResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
+use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
 
 /**
  * Class Util
@@ -22,15 +23,16 @@ use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
  */
 class Util
 {
-    const COMODO_AUTO_APPLY_URL         = "https://secure.comodo.net/products/!AutoApplySSL";
-    const COMODO_AUTO_REVOKE_URL        = "https://secure.comodo.net/products/!AutoRevokeSSL";
-    const COMODO_DCV_MAIL_URL           = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
-    const COMODO_DCV_RESEND_URL         = "https://secure.comodo.net/products/!ResendDCVEmail";
-    const COMODO_AUTO_UPDATE_DCV_URL    = "https://secure.comodo.net/products/!AutoUpdateDCV";
-    const COMODO_PROVIDE_EV_DETAILS_URL = "https://secure.comodo.net/products/!ProvideEVDetails";
-    const COMODO_MDC_DOMAIN_DETAILS_URL = "https://secure.comodo.net/products/!GetMDCDomainDetails";
-    const COMODO_AUTO_REPLACE_URL       = "https://secure.comodo.net/products/!AutoReplaceSSL";
-    const COMODO_COLLECT_SSL_URL        = "https://secure.comodo.net/products/download/CollectSSL";
+    const COMODO_AUTO_APPLY_URL               = "https://secure.comodo.net/products/!AutoApplySSL";
+    const COMODO_AUTO_REVOKE_URL              = "https://secure.comodo.net/products/!AutoRevokeSSL";
+    const COMODO_DCV_MAIL_URL                 = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
+    const COMODO_DCV_RESEND_URL               = "https://secure.comodo.net/products/!ResendDCVEmail";
+    const COMODO_AUTO_UPDATE_DCV_URL          = "https://secure.comodo.net/products/!AutoUpdateDCV";
+    const COMODO_PROVIDE_EV_DETAILS_URL       = "https://secure.comodo.net/products/!ProvideEVDetails";
+    const COMODO_MDC_DOMAIN_DETAILS_URL       = "https://secure.comodo.net/products/!GetMDCDomainDetails";
+    const COMODO_AUTO_REPLACE_URL             = "https://secure.comodo.net/products/!AutoReplaceSSL";
+    const COMODO_COLLECT_SSL_URL              = "https://secure.comodo.net/products/download/CollectSSL";
+    const COMODO_UPDATE_USER_EV_CLICK_THROUGH = "https://secure.comodo.net/products/!UpdateUserEvClickThrough";
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
@@ -73,8 +75,9 @@ class Util
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->communicationAdapter
-                    ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
         if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
@@ -93,6 +96,41 @@ class Util
                 ->setOrderNumber($arr["orderNumber"])
                 ->setTotalCost($arr["totalCost"])
                 ->setRequestQuery($arr['requestQuery']);
+
+            return $result;
+        } else {
+            throw $this->createException($arr);
+        }
+    }
+
+    /**
+     * @param array $params
+     *
+     * @return UpdateUserEvClickThroughResult
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     */
+    public function updateUserEvClickThrough(array $params)
+    {
+        // Send request
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_UPDATE_USER_EV_CLICK_THROUGH,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
+
+        // Successful
+        if ($arr["errorCode"] == 0) {
+            $result = new UpdateUserEvClickThroughResult();
+
+            $result
+                ->setStatus($arr['status']);
 
             return $result;
         } else {
@@ -121,8 +159,12 @@ class Util
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->communicationAdapter
-            ->sendToApi(self::COMODO_AUTO_REPLACE_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_AUTO_REPLACE_URL,
+                $params,CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
 
         // Successful
         if ($arr["errorCode"] == 0) {
@@ -157,9 +199,10 @@ class Util
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
-        return $this->sendBooleanRequest(self::COMODO_AUTO_REVOKE_URL,
-                                         $params,
-                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        return $this->sendBooleanRequest(
+            self::COMODO_AUTO_REVOKE_URL,
+            $params,
+            CommunicationAdapter::RESPONSE_URL_ENCODED
         );
     }
 
@@ -179,9 +222,10 @@ class Util
      */
     public function autoUpdateDCV(array $params)
     {
-        return $this->sendBooleanRequest(self::COMODO_AUTO_UPDATE_DCV_URL,
-                                         $params,
-                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        return $this->sendBooleanRequest(
+            self::COMODO_AUTO_UPDATE_DCV_URL,
+            $params,
+            CommunicationAdapter::RESPONSE_URL_ENCODED
         );
     }
 
@@ -206,8 +250,13 @@ class Util
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
-        $arr = $this->communicationAdapter
-            ->sendToApi(self::COMODO_COLLECT_SSL_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_COLLECT_SSL_URL,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
 
         // Successful
         if ($arr["errorCode"] >= 0) {
@@ -261,14 +310,18 @@ class Util
      */
     public function resendDCVEMail(array $params)
     {
-        return $this->sendBooleanRequest(self::COMODO_DCV_RESEND_URL,
-                                         $params,
-                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        return $this
+            ->sendBooleanRequest(
+                self::COMODO_DCV_RESEND_URL,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
         );
     }
 
     /**
      * @param array $params
+     *
+     * @deprecated Comodo support told this function doesn't have any effect anymore
      *
      * @return bool
      * @throws Model\Exception\AccountException
@@ -280,9 +333,10 @@ class Util
      */
     public function provideEVDetails(array $params)
     {
-        return $this->sendBooleanRequest(self::COMODO_PROVIDE_EV_DETAILS_URL,
-                                         $params,
-                                         CommunicationAdapter::RESPONSE_URL_ENCODED
+        return $this->sendBooleanRequest(
+            self::COMODO_PROVIDE_EV_DETAILS_URL,
+            $params,
+            CommunicationAdapter::RESPONSE_URL_ENCODED
         );
     }
 
@@ -304,12 +358,13 @@ class Util
     public function getDCVEMailAddressList(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->communicationAdapter
-                              ->sendToApi(
-                                  self::COMODO_DCV_MAIL_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_NEW_LINE
-                              );
+        $responseArray = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_DCV_MAIL_URL,
+                $params,
+                CommunicationAdapter::RESPONSE_NEW_LINE
+            );
 
         if ($responseArray["errorCode"] == 0) {
             $result = new GetDCVEMailAddressListResult();
@@ -346,12 +401,13 @@ class Util
     public function getMDCDomainDetails(array $params)
     {
         // Response is always new line encoded
-        $responseArray = $this->communicationAdapter
-                              ->sendToApi(
-                                  self::COMODO_MDC_DOMAIN_DETAILS_URL,
-                                  $params,
-                                  CommunicationAdapter::RESPONSE_URL_ENCODED
-                              );
+        $responseArray = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_MDC_DOMAIN_DETAILS_URL,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
 
         if ($responseArray["errorCode"] == 0) {
             $result = new GetMDCDomainDetailsResult();
@@ -388,7 +444,9 @@ class Util
         }
 
         // this is not a official request, so we need to use the website
-        $responseString = $this->communicationAdapter->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
+        $responseString = $this
+            ->communicationAdapter
+            ->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
 
         // Decode answer from website
         if (stristr($responseString, "You have entered the correct Domain Control Validation code") !== false) {
@@ -418,7 +476,8 @@ class Util
     protected function sendBooleanRequest($url, array $params, $type)
     {
         // Response is always url encoded
-        $responseArray = $this->communicationAdapter
+        $responseArray = $this
+            ->communicationAdapter
             ->sendToApi(
                 $url,
                 $params,
@@ -469,16 +528,17 @@ class Util
     {
         $search = ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"';
 
-        return $this->imapHelper
-                    ->fetchMails(
-                        $this->imapWithSearch,
-                        array(),
-                        $search,
-                        null,
-                        $markProcessed,
-                        true,
-                        $callbackFunction
-                    );
+        return $this
+            ->imapHelper
+            ->fetchMails(
+                $this->imapWithSearch,
+                array(),
+                $search,
+                null,
+                $markProcessed,
+                true,
+                $callbackFunction
+            );
     }
 
     /**
@@ -531,7 +591,7 @@ class Util
             case -11: // unsupported algorithm
             case -12: // invalid signature
             case -13: // unsupported key size
-            case -20: // Already rejected
+            case -20: // Already rejected / Order relevated
             case -21: // Already revoked
             case -26: // current being issued
             case -40: // key compromised
