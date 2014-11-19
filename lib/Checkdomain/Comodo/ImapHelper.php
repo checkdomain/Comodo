@@ -53,9 +53,9 @@ class ImapHelper
             foreach ($result as $id) {
                 $i = count($messages);
 
-                try {
-                    $message = $imap->getMessage($id);
+                $message = $imap->getMessage($id);
 
+                try {
                     $messages[$i]['id']     = $i;
                     $messages[$i]['folder'] = $folder;
 
@@ -85,11 +85,8 @@ class ImapHelper
                     if (is_callable($callbackFunction)) {
                         $success = $callbackFunction($id, $messages[$i]);
                     }
-
-                    if ($markProcessed && $success) {
-                        $this->markProcessed($imap, $message, $id);
-                    }
                 } catch(\Exception $e) {
+                    unset($messages[$i]);
                     // General decoding error -> skip
                 }
             }
