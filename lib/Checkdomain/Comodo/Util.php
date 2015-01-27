@@ -54,6 +54,67 @@ class Util
         $this->imapHelper           = $imapHelper;
     }
 
+
+    /**
+     * @return CommunicationAdapter|null
+     */
+    public function getCommunicationAdapter()
+    {
+        return $this->communicationAdapter;
+    }
+
+    /**
+     * @param CommunicationAdapter|null $communicationAdapter
+     *
+     * @return Util
+     */
+    public function setCommunicationAdapter($communicationAdapter)
+    {
+        $this->communicationAdapter = $communicationAdapter;
+
+        return $this;
+    }
+
+    /**
+     * @return ImapHelper|null
+     */
+    public function getImapHelper()
+    {
+        return $this->imapHelper;
+    }
+
+    /**
+     * @param ImapHelper|null $imapHelper
+     *
+     * @return Util
+     */
+    public function setImapHelper($imapHelper)
+    {
+        $this->imapHelper = $imapHelper;
+
+        return $this;
+    }
+
+    /**
+     * @return ImapWithSearch|null
+     */
+    public function getImapWithSearch()
+    {
+        return $this->imapWithSearch;
+    }
+
+    /**
+     * @param ImapWithSearch|null $imapWithSearch
+     *
+     * @return Util
+     */
+    public function setImapWithSearch($imapWithSearch)
+    {
+        $this->imapWithSearch = $imapWithSearch;
+
+        return $this;
+    }
+
     /**
      * Function apply for a certificate
      *
