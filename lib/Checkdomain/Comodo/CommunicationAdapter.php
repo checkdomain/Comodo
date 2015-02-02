@@ -112,7 +112,7 @@ class CommunicationAdapter
      *
      * @return array|bool
      */
-    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE)
+    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, $notDecode = array())
     {
         $this->preSendToApiCheck();
 
@@ -137,7 +137,7 @@ class CommunicationAdapter
         if ($responseType == self::RESPONSE_NEW_LINE) {
             return $this->decodeNewLineEncodedResponse($responseString, $query);
         } else {
-            return $this->decodeUrlEncodedResponse($responseString, $query);
+            return $this->decodeUrlEncodedResponse($responseString, $query, $notDecode);
         }
     }
 
@@ -223,27 +223,46 @@ class CommunicationAdapter
     }
 
     /**
-     * Decodes a responseString, encoded in query-string-format and returns an response array
+     *  Decodes a responseString, encoded in query-string-format and returns an response array
      *
      * @param string $responseString
      * @param string $requestQuery
+     * @param array  $notDecode
      *
-     * @return array
+     * @return mixed
      */
-    protected function decodeUrlEncodedResponse($responseString, $requestQuery)
+    protected function decodeUrlEncodedResponse($responseString, $requestQuery, $notDecode = array())
     {
         // Splitting response body
-        $responseString = urldecode($responseString);
+
+        if(empty($notDecode)) {
+            $responseString = urldecode($responseString);
+        }
+
         parse_str($responseString, $responseArray);
+
+        if (!empty($notDecode)) {
+            foreach ($responseArray as $index => $value) {
+                if (!in_array($index, $notDecode)) {
+                    $value = urldecode($value);
+                }
+
+                $responseArray[$index] = $value;
+            }
+        }
 
         $responseArray["responseString"] = $responseString;
         $responseArray["requestQuery"]   = $requestQuery;
 
-        if(!isset($responseArray['errorCode'])) {
+        if (!isset($responseArray['errorCode'])) {
             $responseArray['errorCode'] = 99;
             $responseArray['errorMessage'] = $responseString;
         }
 
         return $responseArray;
+    }
+
+    protected function decodeRecursive() {
+
     }
 }

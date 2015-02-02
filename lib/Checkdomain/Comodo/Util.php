@@ -307,6 +307,9 @@ class Util
      */
     public function collectSsl(array $params)
     {
+        // Not decode the following indexes
+        $notDecode = array('caCertificate', 'certificate', 'netscapeCertificateSequence');
+
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
@@ -316,7 +319,8 @@ class Util
             ->sendToApi(
                 self::COMODO_COLLECT_SSL_URL,
                 $params,
-                CommunicationAdapter::RESPONSE_URL_ENCODED
+                CommunicationAdapter::RESPONSE_URL_ENCODED,
+                $notDecode
             );
 
         // Successful
@@ -332,14 +336,15 @@ class Util
     }
 
     /**
-     * @param       $object
-     * @param array $arr
-     * @param array $timestampFields
+     * @param Object $object
+     * @param array  $arr
+     * @param array  $timestampFields
      *
      * @return $this
      */
-    protected function fill($object, array $arr, array $timestampFields = array()) {
-        foreach($arr as $key => $value) {
+    protected function fill($object, array $arr, array $timestampFields = array())
+    {
+        foreach ($arr as $key => $value) {
             if(in_array($key, $timestampFields)) {
                 $value = new \DateTime('@' . $value);
             }
@@ -376,7 +381,7 @@ class Util
                 self::COMODO_DCV_RESEND_URL,
                 $params,
                 CommunicationAdapter::RESPONSE_URL_ENCODED
-        );
+            );
     }
 
     /**
@@ -576,7 +581,7 @@ class Util
         $search = $orList . " " . $whereList;
 
         return $this->imapHelper
-                    ->fetchMails($this->imapWithSearch, array(), $search, null, false, false, $callbackFunction);
+            ->fetchMails($this->imapWithSearch, array(), $search, null, false, false, $callbackFunction);
     }
 
     /**
