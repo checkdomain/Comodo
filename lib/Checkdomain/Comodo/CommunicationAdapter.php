@@ -112,7 +112,7 @@ class CommunicationAdapter
      *
      * @return array|bool
      */
-    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, $notDecode = array())
+    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, $notDecode = array(), $forceArray = array())
     {
         $this->preSendToApiCheck();
 
@@ -137,7 +137,7 @@ class CommunicationAdapter
         if ($responseType == self::RESPONSE_NEW_LINE) {
             return $this->decodeNewLineEncodedResponse($responseString, $query);
         } else {
-            return $this->decodeUrlEncodedResponse($responseString, $query, $notDecode);
+            return $this->decodeUrlEncodedResponse($responseString, $query, $notDecode, $forceArray);
         }
     }
 
@@ -222,23 +222,34 @@ class CommunicationAdapter
         return $responseArray;
     }
 
-    /**
+     /**
      *  Decodes a responseString, encoded in query-string-format and returns an response array
      *
      * @param string $responseString
      * @param string $requestQuery
-     * @param array  $notDecode
+     * @param array $notDecode
+     * @param array $forceArray
      *
      * @return mixed
      */
-    protected function decodeUrlEncodedResponse($responseString, $requestQuery, $notDecode = array())
+    protected function decodeUrlEncodedResponse(
+        $responseString,
+        $requestQuery,
+        $notDecode = array(),
+        $forceArray = array()
+    )
     {
-        // Splitting response body
-
-        if(empty($notDecode)) {
+        if (empty($notDecode)) {
             $responseString = urldecode($responseString);
         }
 
+        if (!empty($forceArray)) {
+            foreach ($forceArray as $param) {
+                $responseString = str_replace($param . '=', $param .'[]=', $responseString);
+            }
+        }
+
+        // Splitting response body
         parse_str($responseString, $responseArray);
 
         if (!empty($notDecode)) {
@@ -260,9 +271,5 @@ class CommunicationAdapter
         }
 
         return $responseArray;
-    }
-
-    protected function decodeRecursive() {
-
     }
 }

@@ -310,6 +310,9 @@ class Util
         // Not decode the following indexes
         $notDecode = array('caCertificate', 'certificate', 'netscapeCertificateSequence');
 
+        // Force threating as array
+        $forceArray = array('caCertificate');
+
         // Two choices, we want url-encoded
         $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
@@ -320,7 +323,8 @@ class Util
                 self::COMODO_COLLECT_SSL_URL,
                 $params,
                 CommunicationAdapter::RESPONSE_URL_ENCODED,
-                $notDecode
+                $notDecode,
+                $forceArray
             );
 
         // Successful
@@ -345,7 +349,7 @@ class Util
     protected function fill($object, array $arr, array $timestampFields = array())
     {
         foreach ($arr as $key => $value) {
-            if(in_array($key, $timestampFields)) {
+            if (in_array($key, $timestampFields)) {
                 $value = new \DateTime('@' . $value);
             }
 
