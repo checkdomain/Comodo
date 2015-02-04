@@ -44,7 +44,7 @@ class CollectSslResult extends AbstractResult
     protected $pkcs7;
 
     /**
-     * @var string
+     * @var array
      */
     protected $caCertificate;
 
@@ -104,15 +104,33 @@ class CollectSslResult extends AbstractResult
     protected $evClickThroughStatus;
 
     /**
-     * @return string
+     * @param bool $wrapCrt
+     * @param bool $addDelimiter
+     *
+     * @return array
      */
-    public function getCaCertificate()
+    public function getCaCertificate($wrapCrt = true, $addDelimiter = true)
     {
-        return $this->caCertificate;
+        $crt = $this->caCertificate;
+
+        foreach ($crt as $i => $val) {
+            if ($wrapCrt) {
+                $crt[$i] = $this->wrapCrt($crt[$i]);
+            }
+
+            if ($addDelimiter) {
+                $crt[$i] = $this->addDelimiter($crt[$i]);
+            }
+        }
+
+        // This is the right order
+        $crt = array_reverse($crt);
+
+        return $crt;
     }
 
     /**
-     * @param string $caCertificate
+     * @param array $caCertificate
      *
      * @return CollectSslResult
      */
@@ -124,11 +142,24 @@ class CollectSslResult extends AbstractResult
     }
 
     /**
+     * @param bool $wrapCrt
+     * @param bool $addDelimiter
+     *
      * @return string
      */
-    public function getCertificate()
+    public function getCertificate($wrapCrt = true, $addDelimiter = true)
     {
-        return $this->certificate;
+        $crt = $this->certificate;
+
+        if ($addDelimiter) {
+            $crt = $this->addDelimiter($crt);
+        }
+
+        if ($wrapCrt) {
+            $crt = $this->wrapCrt($crt);
+        }
+
+        return $crt;
     }
 
     /**
@@ -481,5 +512,32 @@ class CollectSslResult extends AbstractResult
         $this->zipFile = $zipFile;
 
         return $this;
+    }
+
+    /**
+     * @param string $crtContent
+     *
+     * @return string
+     */
+    protected function addDelimiter($crtContent)
+    {
+        $crtContent =
+            '-----BEGIN CERTIFICATE-----' . "\n" .
+            $crtContent . "\n" .
+            '-----END CERTIFICATE-----';
+
+        return $crtContent;
+    }
+
+    /**
+     * @param string $crtContent
+     *
+     * @return string
+     */
+    protected function wrapCrt($crtContent)
+    {
+        $crtContent = wordwrap($crtContent, 64, PHP_EOL, true);
+
+        return $crtContent;
     }
 }
