@@ -308,7 +308,7 @@ class Util
     public function collectSsl(array $params)
     {
         // Not decode the following indexes
-        $notDecode = array('caCertificate', 'certificate', 'netscapeCertificateSequence');
+        $notDecode = array('caCertificate', 'certificate', 'netscapeCertificateSequence', 'zipFile');
 
         // Force threating as array
         $forceArray = array('caCertificate');
