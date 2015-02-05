@@ -135,7 +135,7 @@ class CommunicationAdapter
 
         // Decoding and returning response
         if ($responseType == self::RESPONSE_NEW_LINE) {
-            return $this->decodeNewLineEncodedResponse($responseString, $query);
+            return $this->decodeNewLineEncodedResponse($responseString, $query, $forceArray);
         } else {
             return $this->decodeUrlEncodedResponse($responseString, $query, $notDecode, $forceArray);
         }
@@ -168,7 +168,7 @@ class CommunicationAdapter
      *
      * @return array
      */
-    protected function decodeNewLineEncodedResponse($responseString, $requestQuery)
+    protected function decodeNewLineEncodedResponse($responseString, $requestQuery, $forceArray = array())
     {
         // Splitting response body
         $parts = explode("\n", $responseString);
@@ -216,13 +216,19 @@ class CommunicationAdapter
             $responseArray["errorMessage"] = trim($responseString);
         }
 
+        foreach ($forceArray as $value) {
+            if (isset($responseArray[$value]) && !is_array($responseArray[$value])) {
+                $responseArray[$value] = array($responseArray[$value]);
+            }
+        }
+
         $responseArray["responseString"] = $responseString;
         $responseArray["requestQuery"]   = $requestQuery;
 
         return $responseArray;
     }
 
-     /**
+    /**
      *  Decodes a responseString, encoded in query-string-format and returns an response array
      *
      * @param string $responseString

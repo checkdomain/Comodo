@@ -427,13 +427,18 @@ class Util
      */
     public function getDCVEMailAddressList(array $params)
     {
+        // Force threating as array
+        $forceArray = array('whois_email', 'level2_email', 'level3_email');
+
         // Response is always new line encoded
         $responseArray = $this
             ->communicationAdapter
             ->sendToApi(
                 self::COMODO_DCV_MAIL_URL,
                 $params,
-                CommunicationAdapter::RESPONSE_NEW_LINE
+                CommunicationAdapter::RESPONSE_NEW_LINE,
+                null,
+                $forceArray
             );
 
         if ($responseArray["errorCode"] == 0) {
@@ -443,8 +448,11 @@ class Util
                 ->setDomainName($responseArray["domain_name"])
                 ->setWhoisEmail($responseArray["whois_email"])
                 ->setLevel2Emails($responseArray["level2_email"])
-                ->setLevel3Emails($responseArray["level3_email"])
                 ->setRequestQuery($responseArray['requestQuery']);
+
+            if (isset($responseArray["level3_email"])) {
+                $result->setLevel3Emails($responseArray["level3_email"]);
+            }
 
             return $result;
         } else {
