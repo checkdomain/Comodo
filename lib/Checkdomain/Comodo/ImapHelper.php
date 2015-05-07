@@ -233,7 +233,7 @@ class ImapHelper
             $text = $part;
         }
 
-        return quoted_printable_decode(strip_tags($text));
+        return strip_tags($text);
     }
 
 
