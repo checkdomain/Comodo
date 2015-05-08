@@ -70,7 +70,7 @@ class UtilTest extends AbstractTest
 
         $this->assertInstanceOf('\Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult', $object);
 
-        $this->assertEquals("support@test-domain.org", $object->getWhoisEmail());
+        $this->assertEquals(array("support@test-domain.org"), $object->getWhoisEmail());
         $this->assertEquals("www.test-domain.org", $object->getDomainName());
 
         $this->assertEquals(array('admin@test-domain.org', 'postmaster@test-domain.org'), $object->getLevel2Emails());
