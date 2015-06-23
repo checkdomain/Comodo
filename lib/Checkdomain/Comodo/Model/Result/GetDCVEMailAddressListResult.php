@@ -4,8 +4,6 @@ namespace Checkdomain\Comodo\Model\Result;
 /**
  * Class GetDCVEMailAddressListResult
  * Offers the email-addresses, requested at comodo
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class GetDCVEMailAddressListResult extends AbstractResult
 {

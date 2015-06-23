@@ -3,8 +3,6 @@ namespace Checkdomain\Comodo\Model\Result;
 
 /**
  * Class UpdateUserEvClickThroughResult
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class UpdateUserEvClickThroughResult extends AbstractResult
 {

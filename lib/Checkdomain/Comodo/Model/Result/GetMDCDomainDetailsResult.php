@@ -4,8 +4,6 @@ namespace Checkdomain\Comodo\Model\Result;
 /**
  * Class GetMDCDomainDetailsResult
  * Offers the order Status, requested at comodo
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class GetMDCDomainDetailsResult extends AbstractResult
 {

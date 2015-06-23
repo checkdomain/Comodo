@@ -7,8 +7,6 @@ use Zend\Mail\Storage\Part;
 
 /**
  * Class ImapHelper
- *
- * @package Checkdomain\Administration\CustomerBundle\Controller
  */
 class ImapHelper
 {

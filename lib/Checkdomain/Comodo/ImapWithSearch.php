@@ -7,8 +7,6 @@ use Zend\Mail\Storage\Imap;
 * Class ImapWithSearch
  *
  * Extends the Zend Imap Class
-*
-* @package Checkdomain\Administration\CustomerBundle\Controller
 */
 class ImapWithSearch extends Imap
 {

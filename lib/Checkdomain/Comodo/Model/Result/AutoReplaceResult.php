@@ -3,8 +3,6 @@ namespace Checkdomain\Comodo\Model\Result;
 
 /**
  * Class AutoReplaceResult
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class AutoReplaceResult extends AbstractResult
 {

@@ -18,8 +18,6 @@ use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
 /**
  * Class Util
  * Provides functions to communicate with the Comodo API,requires an Account object, given to the Communication-adapter
- *
- * @package Checkdomain\Comodo
  */
 class Util
 {

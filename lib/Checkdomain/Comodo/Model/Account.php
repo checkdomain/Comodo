@@ -4,8 +4,6 @@ namespace Checkdomain\Comodo\Model;
 /**
  * Class Account
  * Provides the login username and password to comodo
- *
- * @package Checkdomain\Comodo\Model
  */
 class Account
 {

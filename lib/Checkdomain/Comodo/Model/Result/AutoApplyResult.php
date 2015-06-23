@@ -4,8 +4,6 @@ namespace Checkdomain\Comodo\Model\Result;
 /**
  * Class AutoApplyResult
  * Offers the orderNumber, excepted delivery-time, total-cost, certificate-id and tells you if certificate has been paid
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class AutoApplyResult extends AbstractResult
 {

@@ -3,8 +3,6 @@ namespace Checkdomain\Comodo\Model\Result;
 
 /**
  * Class CollectSslResult
- *
- * @package Checkdomain\Comodo\Model\Result
  */
 class CollectSslResult extends AbstractResult
 {
