@@ -3,7 +3,7 @@ README
 
 [![Build Status](https://travis-ci.org/checkdomain/Comodo.svg)](https://travis-ci.org/checkdomain/Comodo)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/checkdomain/Comodo/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/checkdomain/Comodo/?branch=master)
-[![Coverage Status](https://coveralls.io/repos/checkdomain/Comodo/badge.png)](https://coveralls.io/r/checkdomain/Comodo)
+[![Coverage Status](https://coveralls.io/repos/checkdomain/Comodo/badge.svg?branch=master&service=github)](https://coveralls.io/github/checkdomain/Comodo?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/3119495f-5473-4396-9c36-0151add717e9/mini.png)](https://insight.sensiolabs.com/projects/3119495f-5473-4396-9c36-0151add717e9)
 
 
