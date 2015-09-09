@@ -348,12 +348,22 @@ class UtilTest extends AbstractTest
      */
     public function testCollectSslPeriod()
     {
-        $responseText = 'errorCode=1&orderNumber=12345678&notBefore=1388576001&notAfter=1420112001';
+        $responseText = 'errorCode=1&orderNumber=12345678&notBefore=1388576001&notAfter=1420112001&csrStatus=4&certificateStatus=3&validationStatus=1&certificate=234&caCertificate=123&ovCallBackStatus=2';
 
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
         $object = $util->collectSsl(array());
 
+        $caCertificate = ['-----BEGIN CERTIFICATE-----' .PHP_EOL . '123' .  PHP_EOL . '-----END CERTIFICATE-----'];
+        $certificate = '-----BEGIN CERTIFICATE-----' . PHP_EOL .'234' .  PHP_EOL . '-----END CERTIFICATE-----';
+
+        $this->assertEquals($caCertificate, $object->getCaCertificate() );
+        $this->assertEquals($certificate, $object->getCertificate());
+        $this->assertEquals('1', $object->getValidationStatus() );
+        $this->assertEquals('2', $object->getOvCallBackStatus() );
+        $this->assertEquals('3', $object->getCertificateStatus() );
+        $this->assertEquals('4', $object->getCsrStatus() );
+        $this->assertEquals('12345678', $object->getOrderNumber() );
         $this->assertEquals('01.01.2014', $object->getNotBefore()->format('d.m.Y') );
         $this->assertEquals('01.01.2015', $object->getNotAfter()->format('d.m.Y') );
     }
