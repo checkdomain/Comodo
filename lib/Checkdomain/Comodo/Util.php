@@ -647,7 +647,7 @@ class Util
                 return new ArgumentException(
                     $responseArray["errorCode"],
                     $responseArray["errorMessage"],
-                    $responseArray["errorItem"],
+                    ((isset($responseArray["errorItem"])) ? $responseArray["errorItem"] : null),
                     $responseArray["responseString"]
                 );
 
