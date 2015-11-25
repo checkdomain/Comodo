@@ -105,11 +105,15 @@ class CollectSslResult extends AbstractResult
      * @param bool $wrapCrt
      * @param bool $addDelimiter
      *
-     * @return array
+     * @return array|null
      */
     public function getCaCertificate($wrapCrt = true, $addDelimiter = true)
     {
         $crt = $this->caCertificate;
+
+        if ($crt == null) {
+            return null;
+        }
 
         foreach ($crt as $i => $val) {
             if ($wrapCrt) {
@@ -143,11 +147,15 @@ class CollectSslResult extends AbstractResult
      * @param bool $wrapCrt
      * @param bool $addDelimiter
      *
-     * @return string
+     * @return string|null
      */
     public function getCertificate($wrapCrt = true, $addDelimiter = true)
     {
         $crt = $this->certificate;
+
+        if ($crt == null) {
+            return null;
+        }
 
         if ($addDelimiter) {
             $crt = $this->addDelimiter($crt);
