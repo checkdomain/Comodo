@@ -6,7 +6,7 @@ use Checkdomain\Comodo\ImapHelper;
 use Checkdomain\Comodo\ImapWithSearch;
 use Checkdomain\Comodo\Model\Account;
 use Checkdomain\Comodo\Util;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Message;
 
@@ -91,26 +91,25 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createGuzzleClient($responseString)
     {
-        $client   = $this->getMock('Guzzle\Http\Client');
-        $request  = $this->getMock('Guzzle\Http\Message\Request', array(), array(), '', false);
-        $response = $this->getMock('Guzzle\Http\Message\Response', array(), array(), '', false);
+        $client   = $this->getMock('GuzzleHttp\Client');
+        $response = $this->getMock('Psr\Http\Message\ResponseInterface');
+        $body     = $this->getMock('Psr\Http\Message\StreamInterface');
+
+        $body
+            ->expects($this->any())
+            ->method('getContents')
+            ->will($this->returnValue($responseString));
 
         $response
             ->expects($this->any())
             ->method('getBody')
-            ->will($this->returnValue($responseString));
-
-        $request
-            ->expects($this->any())
-            ->method('send')
-            ->will($this->returnValue($response));
+            ->will($this->returnValue($body));
 
         $client
             ->expects($this->any())
-            ->method('post')
-            ->will($this->returnValue($request));
+            ->method('request')
+            ->will($this->returnValue($response));
 
         return $client;
     }
 }
-

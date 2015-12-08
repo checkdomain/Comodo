@@ -2,7 +2,7 @@
 namespace Checkdomain\Comodo;
 
 use Checkdomain\Comodo\Model\Account;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 /**
  * Class CommunicationAdapter
@@ -27,7 +27,7 @@ class CommunicationAdapter
     /**
      * @param \Checkdomain\Comodo\Model\Account $account
      *
-     * @return Util
+     * @return CommunicationAdapter
      */
     public function setAccount($account)
     {
@@ -55,9 +55,9 @@ class CommunicationAdapter
     }
 
     /**
-     * @param \Guzzle\Http\Client $client
+     * @param \GuzzleHttp\Client $client
      *
-     * @return Util
+     * @return CommunicationAdapter
      */
     public function setClient($client)
     {
@@ -67,7 +67,7 @@ class CommunicationAdapter
     }
 
     /**
-     * @return \Guzzle\Http\Client
+     * @return \GuzzleHttp\Client
      */
     public function getClient()
     {
@@ -88,16 +88,14 @@ class CommunicationAdapter
      */
     public function sendToWebsite($url, array $params)
     {
-        $urlEncoded = http_build_query($params, '', '&');
-
         // Sending request
         $client  = $this->getClient();
-        $request = $client->post($url, null, $urlEncoded);
-
-        $response = $request->send();
+        $response = $client->request('POST', $url, [
+            'query' => http_build_query($params, '', '&')
+        ]);
 
         // Getting response body
-        $responseString = $response->getBody(true);
+        $responseString = $response->getBody()->getContents();
         $responseString = trim($responseString);
 
         return $responseString;
@@ -106,13 +104,15 @@ class CommunicationAdapter
     /**
      * Send a request to the comodo API, and decodes the response as given
      *
-     * @param string $url
-     * @param array  $params
-     * @param int    $responseType
+     * @param string     $url
+     * @param array      $params
+     * @param int        $responseType
+     * @param array|null $notDecode
+     * @param array      $forceArray
      *
      * @return array|bool
      */
-    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, $notDecode = array(), $forceArray = array())
+    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, array $notDecode = null, $forceArray = array())
     {
         $this->preSendToApiCheck();
 
@@ -124,13 +124,13 @@ class CommunicationAdapter
 
         // Sending request
         $client   = $this->getClient();
-        $request  = $client->post($url, null, $fields);
+        $response = $client->request('POST', $url, [
+            'body' => $fields
+        ]);
         $query    = http_build_query($params);
 
-        $response = $request->send();
-
         // Getting response body
-        $responseString = $response->getBody(true);
+        $responseString = $response->getBody()->getContents();
         $responseString = trim($responseString);
 
         // Decoding and returning response
@@ -165,10 +165,11 @@ class CommunicationAdapter
      *
      * @param string $responseString
      * @param string $requestQuery
+     * @param array  $forceArray
      *
      * @return array
      */
-    protected function decodeNewLineEncodedResponse($responseString, $requestQuery, $forceArray = array())
+    protected function decodeNewLineEncodedResponse($responseString, $requestQuery, array $forceArray = array())
     {
         // Splitting response body
         $parts = explode("\n", $responseString);
@@ -190,7 +191,7 @@ class CommunicationAdapter
 
                 $partCount = count($parts);
                 for ($i = 1; $i < $partCount; $i++) {
-                    $tmp = preg_split("/[\s\t]+/", $parts[$i], 2);
+                    $tmp = preg_split('/[\s\t]+/', $parts[$i], 2);
 
                     $key   = trim($tmp[0]);
                     $value = trim($tmp[1]);
@@ -231,17 +232,17 @@ class CommunicationAdapter
     /**
      *  Decodes a responseString, encoded in query-string-format and returns an response array
      *
-     * @param string $responseString
-     * @param string $requestQuery
-     * @param array $notDecode
-     * @param array $forceArray
+     * @param string   $responseString
+     * @param string   $requestQuery
+     * @param array    $notDecode
+     * @param string[] $forceArray
      *
      * @return mixed
      */
     protected function decodeUrlEncodedResponse(
         $responseString,
         $requestQuery,
-        $notDecode = array(),
+        array $notDecode = null,
         $forceArray = array()
     )
     {
@@ -256,6 +257,7 @@ class CommunicationAdapter
         }
 
         // Splitting response body
+        $responseArray = [];
         parse_str($responseString, $responseArray);
 
         if (!empty($notDecode)) {

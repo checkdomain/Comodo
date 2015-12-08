@@ -1,14 +1,6 @@
 <?php
 namespace Checkdomain\Comodo\Tests;
 
-use Checkdomain\Comodo\CommunicationAdapter;
-use Checkdomain\Comodo\ImapHelper;
-use Checkdomain\Comodo\ImapWithSearch;
-use Checkdomain\Comodo\Model\Account;
-use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
-use Checkdomain\Comodo\Util;
-use Guzzle\Http\Client;
-
 class UtilTest extends AbstractTest
 {
     /**

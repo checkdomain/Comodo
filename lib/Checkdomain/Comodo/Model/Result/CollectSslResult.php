@@ -111,7 +111,7 @@ class CollectSslResult extends AbstractResult
     {
         $crt = $this->caCertificate;
 
-        if ($crt == null) {
+        if ($crt === null) {
             return null;
         }
 
@@ -153,7 +153,7 @@ class CollectSslResult extends AbstractResult
     {
         $crt = $this->certificate;
 
-        if ($crt == null) {
+        if ($crt === null) {
             return null;
         }
 
