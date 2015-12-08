@@ -34,9 +34,20 @@ class Util
 
     const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
 
-    protected $communicationAdapter = null;
-    protected $imapWithSearch = null;
-    protected $imapHelper = null;
+    /**
+     * @var CommunicationAdapter
+     */
+    protected $communicationAdapter;
+
+    /**
+     * @var ImapWithSearch
+     */
+    protected $imapWithSearch;
+
+    /**
+     * @var ImapHelper
+     */
+    protected $imapHelper;
 
     /**
      * Constructs the Util with a communicationAdapter
@@ -54,7 +65,7 @@ class Util
 
 
     /**
-     * @return CommunicationAdapter|null
+     * @return CommunicationAdapter
      */
     public function getCommunicationAdapter()
     {
@@ -62,11 +73,11 @@ class Util
     }
 
     /**
-     * @param CommunicationAdapter|null $communicationAdapter
+     * @param CommunicationAdapter $communicationAdapter
      *
      * @return Util
      */
-    public function setCommunicationAdapter($communicationAdapter)
+    public function setCommunicationAdapter(CommunicationAdapter $communicationAdapter)
     {
         $this->communicationAdapter = $communicationAdapter;
 
@@ -74,7 +85,7 @@ class Util
     }
 
     /**
-     * @return ImapHelper|null
+     * @return ImapHelper
      */
     public function getImapHelper()
     {
@@ -82,11 +93,11 @@ class Util
     }
 
     /**
-     * @param ImapHelper|null $imapHelper
+     * @param ImapHelper $imapHelper
      *
      * @return Util
      */
-    public function setImapHelper($imapHelper)
+    public function setImapHelper(ImapHelper $imapHelper)
     {
         $this->imapHelper = $imapHelper;
 
@@ -94,7 +105,7 @@ class Util
     }
 
     /**
-     * @return ImapWithSearch|null
+     * @return ImapWithSearch
      */
     public function getImapWithSearch()
     {
@@ -102,11 +113,11 @@ class Util
     }
 
     /**
-     * @param ImapWithSearch|null $imapWithSearch
+     * @param ImapWithSearch $imapWithSearch
      *
      * @return Util
      */
-    public function setImapWithSearch($imapWithSearch)
+    public function setImapWithSearch(ImapWithSearch $imapWithSearch)
     {
         $this->imapWithSearch = $imapWithSearch;
 
@@ -338,13 +349,13 @@ class Util
     }
 
     /**
-     * @param Object $object
-     * @param array  $arr
-     * @param array  $timestampFields
+     * @param CollectSslResult $object
+     * @param array            $arr
+     * @param array            $timestampFields
      *
      * @return $this
      */
-    protected function fill($object, array $arr, array $timestampFields = array())
+    protected function fill(CollectSslResult $object, array $arr, array $timestampFields = array())
     {
         foreach ($arr as $key => $value) {
             if (in_array($key, $timestampFields)) {

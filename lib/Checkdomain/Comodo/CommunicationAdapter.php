@@ -104,13 +104,15 @@ class CommunicationAdapter
     /**
      * Send a request to the comodo API, and decodes the response as given
      *
-     * @param string $url
-     * @param array  $params
-     * @param int    $responseType
+     * @param string     $url
+     * @param array      $params
+     * @param int        $responseType
+     * @param array|null $notDecode
+     * @param array      $forceArray
      *
      * @return array|bool
      */
-    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, $notDecode = array(), $forceArray = array())
+    public function sendToApi($url, array $params, $responseType = self::RESPONSE_NEW_LINE, array $notDecode = null, $forceArray = array())
     {
         $this->preSendToApiCheck();
 
@@ -163,10 +165,11 @@ class CommunicationAdapter
      *
      * @param string $responseString
      * @param string $requestQuery
+     * @param array  $forceArray
      *
      * @return array
      */
-    protected function decodeNewLineEncodedResponse($responseString, $requestQuery, $forceArray = array())
+    protected function decodeNewLineEncodedResponse($responseString, $requestQuery, array $forceArray = array())
     {
         // Splitting response body
         $parts = explode("\n", $responseString);
@@ -239,7 +242,7 @@ class CommunicationAdapter
     protected function decodeUrlEncodedResponse(
         $responseString,
         $requestQuery,
-        $notDecode = array(),
+        array $notDecode = null,
         $forceArray = array()
     )
     {
@@ -254,6 +257,7 @@ class CommunicationAdapter
         }
 
         // Splitting response body
+        $responseArray = [];
         parse_str($responseString, $responseArray);
 
         if (!empty($notDecode)) {
