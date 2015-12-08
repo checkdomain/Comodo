@@ -27,7 +27,7 @@ class CommunicationAdapter
     /**
      * @param \Checkdomain\Comodo\Model\Account $account
      *
-     * @return Util
+     * @return CommunicationAdapter
      */
     public function setAccount($account)
     {
@@ -57,7 +57,7 @@ class CommunicationAdapter
     /**
      * @param \GuzzleHttp\Client $client
      *
-     * @return Util
+     * @return CommunicationAdapter
      */
     public function setClient($client)
     {
@@ -191,7 +191,7 @@ class CommunicationAdapter
 
                 $partCount = count($parts);
                 for ($i = 1; $i < $partCount; $i++) {
-                    $tmp = preg_split("/[\s\t]+/", $parts[$i], 2);
+                    $tmp = preg_split('/[\s\t]+/', $parts[$i], 2);
 
                     $key   = trim($tmp[0]);
                     $value = trim($tmp[1]);
@@ -232,10 +232,10 @@ class CommunicationAdapter
     /**
      *  Decodes a responseString, encoded in query-string-format and returns an response array
      *
-     * @param string $responseString
-     * @param string $requestQuery
-     * @param array $notDecode
-     * @param array $forceArray
+     * @param string   $responseString
+     * @param string   $requestQuery
+     * @param array    $notDecode
+     * @param string[] $forceArray
      *
      * @return mixed
      */
