@@ -2,7 +2,7 @@
 namespace Checkdomain\Comodo;
 
 use Checkdomain\Comodo\Model\Account;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 
 /**
  * Class CommunicationAdapter
@@ -55,7 +55,7 @@ class CommunicationAdapter
     }
 
     /**
-     * @param \Guzzle\Http\Client $client
+     * @param \GuzzleHttp\Client $client
      *
      * @return Util
      */
@@ -67,7 +67,7 @@ class CommunicationAdapter
     }
 
     /**
-     * @return \Guzzle\Http\Client
+     * @return \GuzzleHttp\Client
      */
     public function getClient()
     {
@@ -88,16 +88,14 @@ class CommunicationAdapter
      */
     public function sendToWebsite($url, array $params)
     {
-        $urlEncoded = http_build_query($params, '', '&');
-
         // Sending request
         $client  = $this->getClient();
-        $request = $client->post($url, null, $urlEncoded);
-
-        $response = $request->send();
+        $response = $client->request('POST', $url, [
+            'query' => http_build_query($params, '', '&')
+        ]);
 
         // Getting response body
-        $responseString = $response->getBody(true);
+        $responseString = $response->getBody()->getContents();
         $responseString = trim($responseString);
 
         return $responseString;
@@ -124,13 +122,13 @@ class CommunicationAdapter
 
         // Sending request
         $client   = $this->getClient();
-        $request  = $client->post($url, null, $fields);
+        $response = $client->request('POST', $url, [
+            'body' => $fields
+        ]);
         $query    = http_build_query($params);
 
-        $response = $request->send();
-
         // Getting response body
-        $responseString = $response->getBody(true);
+        $responseString = $response->getBody()->getContents();
         $responseString = trim($responseString);
 
         // Decoding and returning response
