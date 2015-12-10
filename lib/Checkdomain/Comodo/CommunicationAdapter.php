@@ -125,7 +125,7 @@ class CommunicationAdapter
         // Sending request
         $client   = $this->getClient();
         $response = $client->request('POST', $url, [
-            'body' => $fields
+            'form_params' => $fields
         ]);
         $query    = http_build_query($params);
 
