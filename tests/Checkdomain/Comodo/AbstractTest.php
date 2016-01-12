@@ -13,7 +13,7 @@ use Zend\Mail\Storage\Message;
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ImapAdapter
      */
     protected function createImapAdpater()
     {

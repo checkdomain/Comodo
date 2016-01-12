@@ -260,7 +260,7 @@ class CommunicationAdapter
         $responseArray = [];
         parse_str($responseString, $responseArray);
 
-        if (!empty($notDecode)) {
+        if (!empty($notDecode) && is_array($responseArray)) {
             foreach ($responseArray as $index => $value) {
                 if (!in_array($index, $notDecode)) {
                     $value = urldecode($value);

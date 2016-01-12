@@ -28,13 +28,13 @@ class ImapHelper
     /**
      *  Fetches the mail recursively, through the folders.
      *
-     * @param ImapWithSearch $imap             imap helper class
-     * @param array          $messages         (internal)
-     * @param string         $search           imap-searchterm
-     * @param Folder         $folders          the subfolders
-     * @param bool           $markProcessed    Sets the flag as processed
-     * @param bool           $assume           Assumes domainName / order-Number in the mail
-     * @param \Closure       $callbackFunction callback
+     * @param ImapAdapter $imap             imap helper class
+     * @param array       $messages         (internal)
+     * @param string      $search           imap-searchterm
+     * @param Folder      $folders          the subfolders
+     * @param bool        $markProcessed    Sets the flag as processed
+     * @param bool        $assume           Assumes domainName / order-Number in the mail
+     * @param \Closure    $callbackFunction callback
      *
      * @return array
      */
@@ -113,9 +113,9 @@ class ImapHelper
     /**
      * Marks the mail with the processed flag
      *
-     * @param ImapWithSearch $imap
-     * @param Message        $message
-     * @param integer        $id
+     * @param ImapAdapter $imap
+     * @param Message     $message
+     * @param integer     $id
      */
     protected function markProcessed(ImapAdapter $imap, Message $message, $id)
     {
