@@ -56,7 +56,7 @@ class Util
      * @param ImapWithSearch|null       $imapWithSearch
      * @param ImapHelper|null           $imapHelper
      */
-    public function __construct(CommunicationAdapter $communicationAdapter, ImapWithSearch $imapWithSearch, ImapHelper $imapHelper)
+    public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapWithSearch, ImapHelper $imapHelper)
     {
         $this->communicationAdapter = $communicationAdapter;
         $this->imapWithSearch       = $imapWithSearch;
@@ -117,7 +117,7 @@ class Util
      *
      * @return Util
      */
-    public function setImapWithSearch(ImapWithSearch $imapWithSearch)
+    public function setImapWithSearch(ImapAdapter $imapWithSearch)
     {
         $this->imapWithSearch = $imapWithSearch;
 

@@ -38,7 +38,7 @@ class ImapHelper
      *
      * @return array
      */
-    public function fetchMails(ImapWithSearch $imap, array $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
+    public function fetchMails(ImapAdapter $imap, array $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
     {
         if ($folders === null) {
             $folders = $imap->getFolders();
@@ -117,7 +117,7 @@ class ImapHelper
      * @param Message        $message
      * @param integer        $id
      */
-    protected function markProcessed(ImapWithSearch $imap, Message $message, $id)
+    protected function markProcessed(ImapAdapter $imap, Message $message, $id)
     {
         $flags   = $message->getFlags();
         $flags[] = self::PROCESSED_FLAG;

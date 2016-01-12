@@ -3,7 +3,7 @@ namespace Checkdomain\Comodo\Tests;
 
 use Checkdomain\Comodo\CommunicationAdapter;
 use Checkdomain\Comodo\ImapHelper;
-use Checkdomain\Comodo\ImapWithSearch;
+use Checkdomain\Comodo\ImapAdapter;
 use Checkdomain\Comodo\Model\Account;
 use Checkdomain\Comodo\Util;
 use GuzzleHttp\Client;
@@ -15,21 +15,33 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createImapWithSearch()
+    protected function createImapAdpater()
     {
-        $imapWithSearch = $this->getMock('Checkdomain\Comodo\ImapWithSearch', array(), array(), '', false, false);
+        $imapAdapter = new ImapAdapter();
 
-        $imapWithSearch
+        $imapAdapter->setInstance($this->createImapExtension());
+
+        return $imapAdapter;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createImapExtension()
+    {
+        $imapExtension = $this->getMock('Checkdomain\Comodo\ImapExtension', array(), array(), '', false, false);
+
+        $imapExtension
             ->expects($this->any())
             ->method('getFolders')
             ->will($this->returnValue(array($this->createZendImapStorageFolder())));
 
-        $imapWithSearch
+        $imapExtension
             ->expects($this->any())
             ->method('selectFolder')
             ->will($this->returnValue(true));
 
-        return $imapWithSearch;
+        return $imapExtension;
     }
 
     /**
@@ -57,9 +69,9 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $imapHelper = $this->createImapHelper();
 
         /**
-         * @var ImapWithSearch $imapWithSearch
+         * @var ImapAdapter $imapAdapter
          */
-        $imapWithSearch = $this->createImapWithSearch();
+        $imapAdapter = $this->createImapAdpater();
 
         $communicationAdapter = new CommunicationAdapter(new Account('test_user', 'test_password'));
 
@@ -67,7 +79,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
             $communicationAdapter->setClient($client);
         }
 
-        $util = new Util($communicationAdapter, $imapWithSearch, $imapHelper);
+        $util = new Util($communicationAdapter, $imapAdapter, $imapHelper);
 
         return $util;
     }
