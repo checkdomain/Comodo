@@ -40,9 +40,9 @@ class Util
     protected $communicationAdapter;
 
     /**
-     * @var ImapWithSearch
+     * @var ImapAdapter
      */
-    protected $imapWithSearch;
+    protected $imapAdapter;
 
     /**
      * @var ImapHelper
@@ -53,13 +53,13 @@ class Util
      * Constructs the Util with a communicationAdapter
      *
      * @param CommunicationAdapter|null $communicationAdapter
-     * @param ImapWithSearch|null       $imapWithSearch
+     * @param ImapAdapter|null       $imapAdapter
      * @param ImapHelper|null           $imapHelper
      */
-    public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapWithSearch, ImapHelper $imapHelper)
+    public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapAdapter, ImapHelper $imapHelper)
     {
         $this->communicationAdapter = $communicationAdapter;
-        $this->imapWithSearch       = $imapWithSearch;
+        $this->imapAdapter       = $imapAdapter;
         $this->imapHelper           = $imapHelper;
     }
 
@@ -105,21 +105,21 @@ class Util
     }
 
     /**
-     * @return ImapWithSearch
+     * @return ImapAdapter
      */
-    public function getImapWithSearch()
+    public function getImapAdapter()
     {
-        return $this->imapWithSearch;
+        return $this->imapAdapter;
     }
 
     /**
-     * @param ImapWithSearch $imapWithSearch
+     * @param ImapAdapter $imapAdapter
      *
      * @return Util
      */
-    public function setImapWithSearch(ImapAdapter $imapWithSearch)
+    public function setImapAdapter(ImapAdapter $imapAdapter)
     {
-        $this->imapWithSearch = $imapWithSearch;
+        $this->imapAdapter = $imapAdapter;
 
         return $this;
     }
@@ -602,7 +602,7 @@ class Util
         $search = $orList . " " . $whereList;
 
         return $this->imapHelper
-            ->fetchMails($this->imapWithSearch, array(), $search, null, false, false, $callbackFunction);
+            ->fetchMails($this->imapAdapter, array(), $search, null, false, false, $callbackFunction);
     }
 
     /**
@@ -618,7 +618,7 @@ class Util
         return $this
             ->imapHelper
             ->fetchMails(
-                $this->imapWithSearch,
+                $this->imapAdapter,
                 array(),
                 $search,
                 null,
