@@ -53,13 +53,13 @@ class Util
      * Constructs the Util with a communicationAdapter
      *
      * @param CommunicationAdapter|null $communicationAdapter
-     * @param ImapAdapter|null       $imapAdapter
+     * @param ImapAdapter|null          $imapAdapter
      * @param ImapHelper|null           $imapHelper
      */
     public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapAdapter, ImapHelper $imapHelper)
     {
         $this->communicationAdapter = $communicationAdapter;
-        $this->imapAdapter       = $imapAdapter;
+        $this->imapAdapter          = $imapAdapter;
         $this->imapHelper           = $imapHelper;
     }
 
@@ -142,7 +142,8 @@ class Util
     public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params["responseFormat"]    = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params["showCertificateID"] = "Y";
 
         // Send request
         $arr = $this
