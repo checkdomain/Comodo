@@ -231,7 +231,7 @@ class UtilTest extends AbstractTest
 
         $object = $util->autoApplySSL($params);
 
-        $this->assertEquals('orderNumber=1234567&dcvMethod=EMAIL&responseFormat=1', $object->getRequestQuery());
+        $this->assertEquals('orderNumber=1234567&dcvMethod=EMAIL&responseFormat=1&showCertificateID=Y', $object->getRequestQuery());
     }
 
     /**
