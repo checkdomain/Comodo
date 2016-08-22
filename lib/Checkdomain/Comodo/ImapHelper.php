@@ -49,43 +49,41 @@ class ImapHelper
             $result = $imap->search(array($search));
 
             foreach ($result as $id) {
-                $i = count($messages);
-
                 $message = $imap->getMessage($id);
 
                 try {
-                    $messages[$i]['id']     = $i;
-                    $messages[$i]['folder'] = $folder;
+                    $messages[$id]['id']     = $id;
+                    $messages[$id]['folder'] = $folder;
 
                     // Zend-mail sometimes got problems, with incorrect e-mails
                     try {
-                        $messages[$i]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
+                        $messages[$id]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
                     } catch (\Exception $e) {
-                        $messages[$i]['subject'] = '-No subject-';
+                        $messages[$id]['subject'] = '-No subject-';
                     }
 
                     try {
-                        $messages[$i]['received'] = strtotime($message->getHeader('date', 'string'));
+                        $messages[$id]['received'] = strtotime($message->getHeader('date', 'string'));
                     } catch (\Exception $e) {
-                        $messages[$i]['received'] = '-No date-';
+                        $messages[$id]['received'] = '-No date-';
                     }
 
-                    $messages[$i]['plainText']   = $this->getPlainText($message);
-                    $messages[$i]['attachments'] = $this->getAttachments($message);
-                    $messages[$i]['type']        = $this->getTypeOfMail($messages[$i]);
+                    $messages[$id]['plainText']   = $this->getPlainText($message);
+                    $messages[$id]['attachments'] = $this->getAttachments($message);
+                    $messages[$id]['type']        = $this->getTypeOfMail($messages[$id]);
 
                     if ($assume) {
-                        $messages[$i]['orderNumber'] = $this->assumeOrderNumber($messages[$i]);
-                        $messages[$i]['domainName']  = $this->assumeDomainName($messages[$i]);
+                        $messages[$id]['orderNumber'] = $this->assumeOrderNumber($messages[$id]);
+                        $messages[$id]['domainName']  = $this->assumeDomainName($messages[$id]);
                     }
 
                     $success = true;
                     if (is_callable($callbackFunction)) {
-                        $success = $callbackFunction($id, $messages[$i]);
+                        $success = $callbackFunction($id, $messages[$id]);
                     }
                 } catch(\Exception $e) {
                     // General decoding error -> removeMessage
-                    unset($messages[$i]);
+                    unset($messages[$id]);
 
                     // Always mark as processed
                     $success = true;
