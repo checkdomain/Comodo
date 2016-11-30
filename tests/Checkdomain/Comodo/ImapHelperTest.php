@@ -138,7 +138,11 @@ class ImapHelperTest extends AbstractTest
     {
         $messageData = $this->messages[$id];
 
-        $message = $this->getMock('Zend\Mail\Storage\Message', array(), array(), '', false, false);
+        $message = $this->getMockBuilder(Message::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
+
         $message
             ->expects($this->any())
             ->method('getHeader')

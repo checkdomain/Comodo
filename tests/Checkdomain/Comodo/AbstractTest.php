@@ -2,11 +2,14 @@
 namespace Checkdomain\Comodo\Tests;
 
 use Checkdomain\Comodo\CommunicationAdapter;
+use Checkdomain\Comodo\ImapExtension;
 use Checkdomain\Comodo\ImapHelper;
 use Checkdomain\Comodo\ImapAdapter;
 use Checkdomain\Comodo\Model\Account;
 use Checkdomain\Comodo\Util;
 use GuzzleHttp\Client;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
 use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Message;
 
@@ -29,7 +32,10 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createImapExtension()
     {
-        $imapExtension = $this->getMock('Checkdomain\Comodo\ImapExtension', array(), array(), '', false, false);
+        $imapExtension = $this->getMockBuilder(ImapExtension::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
 
         $imapExtension
             ->expects($this->any())
@@ -49,7 +55,11 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createZendImapStorageFolder()
     {
-        $folder = $this->getMock('Zend\Mail\Storage\Folder', array(), array('INBOX'), '', false, false);
+        $folder = $this->getMockBuilder(Folder::class)
+            ->setConstructorArgs(['INBOX'])
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->getMock();
 
         return $folder;
     }
@@ -89,7 +99,11 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function createImapHelper()
     {
-        $imapHelper = $this->getMock('Checkdomain\Comodo\ImapHelper', null, array(), '', false, false, false);
+        $imapHelper = $this->getMockBuilder(ImapHelper::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableAutoload()
+            ->getMock();
 
         return $imapHelper;
     }
@@ -103,9 +117,9 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createGuzzleClient($responseString)
     {
-        $client   = $this->getMock('GuzzleHttp\Client');
-        $response = $this->getMock('Psr\Http\Message\ResponseInterface');
-        $body     = $this->getMock('Psr\Http\Message\StreamInterface');
+        $client   = $this->createMock(Client::class);
+        $response = $this->createMock(ResponseInterface::class);
+        $body     = $this->createMock(StreamInterface::class);
 
         $body
             ->expects($this->any())
