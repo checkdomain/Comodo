@@ -11,28 +11,27 @@ use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Zend\Mail\Storage\Folder;
-use Zend\Mail\Storage\Message;
 
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @return ImapAdapter
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapAdapter
      */
-    protected function createImapAdpater()
+    protected function createImapAdapter()
     {
         $imapAdapter = new ImapAdapter();
-
         $imapAdapter->setInstance($this->createImapExtension());
 
         return $imapAdapter;
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapExtension
      */
     protected function createImapExtension()
     {
-        $imapExtension = $this->getMockBuilder(ImapExtension::class)
+        $imapExtension = $this
+            ->getMockBuilder(ImapExtension::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
             ->getMock();
@@ -40,7 +39,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         $imapExtension
             ->expects($this->any())
             ->method('getFolders')
-            ->will($this->returnValue(array($this->createZendImapStorageFolder())));
+            ->will($this->returnValue([$this->createZendImapStorageFolder()]));
 
         $imapExtension
             ->expects($this->any())
@@ -51,17 +50,16 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Zend\Mail\Storage\Folder
      */
     protected function createZendImapStorageFolder()
     {
-        $folder = $this->getMockBuilder(Folder::class)
+        return $this
+            ->getMockBuilder(Folder::class)
             ->setConstructorArgs(['INBOX'])
             ->disableOriginalConstructor()
             ->disableOriginalClone()
             ->getMock();
-
-        return $folder;
     }
 
     /**
@@ -73,39 +71,28 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createUtil(Client $client = null)
     {
-        /**
-         * @var ImapHelper $imapHelper
-         */
         $imapHelper = $this->createImapHelper();
-
-        /**
-         * @var ImapAdapter $imapAdapter
-         */
-        $imapAdapter = $this->createImapAdpater();
-
+        $imapAdapter = $this->createImapAdapter();
         $communicationAdapter = new CommunicationAdapter(new Account('test_user', 'test_password'));
 
         if ($client != null) {
             $communicationAdapter->setClient($client);
         }
 
-        $util = new Util($communicationAdapter, $imapAdapter, $imapHelper);
-
-        return $util;
+        return new Util($communicationAdapter, $imapAdapter, $imapHelper);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapHelper
      */
     public function createImapHelper()
     {
-        $imapHelper = $this->getMockBuilder(ImapHelper::class)
+        return $this
+            ->getMockBuilder(ImapHelper::class)
             ->disableOriginalConstructor()
             ->disableOriginalClone()
             ->disableAutoload()
             ->getMock();
-
-        return $imapHelper;
     }
 
     /**
@@ -113,7 +100,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      *
      * @param $responseString
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|\GuzzleHttp\Client
      */
     protected function createGuzzleClient($responseString)
     {

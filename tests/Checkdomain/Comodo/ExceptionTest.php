@@ -11,12 +11,15 @@ class ExceptionTest extends AbstractTest
      */
     public function testArgumentException()
     {
-        $responseText = 'errorCode=-2&errorItem=field&errorMessage=Invalid Request';
-        $util = $this->createUtil($this->createGuzzleClient($responseText));
+        $util = $this->createUtil($this->createGuzzleClient(http_build_query([
+            'errorCode'    => -2,
+            'errorItem'    => 'field',
+            'errorMessage' => 'InvalidRequest',
+        ])));
 
         try {
-            $util->autoApplySSL(array());
-        } catch (ArgumentException $e){
+            $util->autoApplySSL([]);
+        } catch (ArgumentException $e) {
             $this->assertEquals('field', $e->getArgumentName());
         }
     }
@@ -26,13 +29,14 @@ class ExceptionTest extends AbstractTest
      */
     public function testCommonException()
     {
-        $responseText = 'errorCode=-15&errorMessage=Invalid Request';
-
-        $util = $this->createUtil($this->createGuzzleClient($responseText));
+        $util = $this->createUtil($this->createGuzzleClient(http_build_query([
+            'errorCode'    => -15,
+            'errorMessage' => 'Invalid Request',
+        ])));
 
         try {
-            $util->autoApplySSL(array());
-        } catch (AccountException $e){
+            $util->autoApplySSL([]);
+        } catch (AccountException $e) {
             $this->assertEquals($e->getMessage(), 'Invalid Request');
             $this->assertEquals(-15, $e->getCode());
         }
