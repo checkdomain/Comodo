@@ -18,31 +18,24 @@ class ImapHelperTest extends AbstractTest
     /**
      * @var array
      */
-    private $messages;
-
-    public function __construct()
-    {
-        $this->imapHelper = new ImapHelper();
-
-        $this->messages[0] = array(
+    private $messages = [
+        [
             'subject'     => 'ORDER #12456789 - Your PositiveSSL Certificate for test.test.de',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Your PositiveSSL Certificate for test.test.de is attached!',
             'type'        => 'issued',
             'domainName'  => 'test.test.de',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[1] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'ORDER #12456789 - Your PositiveSSL Certificate for *.öäüäö.de',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Your PositiveSSL Certificate for *.öäüäö.de is attached!',
             'type'        => 'issued',
             'domainName'  => '*.öäüäö.de',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[2] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'CONFIRMATION',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Thank you for placing your order. Your details have been passed to Comodo, who will be validating your order. Your Order Number is 12456789.
@@ -50,10 +43,9 @@ class ImapHelperTest extends AbstractTest
                             www.test.de. Please quote this Order Number in all correspondence. You have purchased:',
             'type'        => 'confirmation',
             'domainName'  => 'www.test.de',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[3] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Customer certificate expiry warning (1 days)',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Domain:- test.test.co.uk
@@ -61,10 +53,9 @@ class ImapHelperTest extends AbstractTest
                             The Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789',
             'type'        => '1_expiry',
             'domainName'  => 'test.test.co.uk',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[4] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Customer certificate expiry warning (30 days)',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Domain:- test.test.co.uk
@@ -72,10 +63,9 @@ class ImapHelperTest extends AbstractTest
                             The Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789',
             'type'        => '30_expiry',
             'domainName'  => 'test.test.co.uk',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[4] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Customer certificate expiry warning (60 days)',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Domain:- test.test.co.uk
@@ -83,10 +73,9 @@ class ImapHelperTest extends AbstractTest
                             The Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789',
             'type'        => '60_expiry',
             'domainName'  => 'test.test.co.uk',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[5] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Information Required Order 12456789',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Thank you for your recent order.
@@ -97,35 +86,44 @@ class ImapHelperTest extends AbstractTest
                             Domain Name: test.test.de ',
             'type'        => 'information_required',
             'domainName'  => 'test.test.de',
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[6] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Trashmail',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Just some trash',
             'type'        => null,
             'domainName'  => null,
-            'orderNumber' => null
-        );
-
-        $this->messages[7] = array(
+            'orderNumber' => null,
+        ],
+        [
             'subject'     => 'Trash for Order-Number: #12456789',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Just some trash',
             'type'        => null,
             'domainName'  => null,
-            'orderNumber' => '12456789'
-        );
-
-        $this->messages[8] = array(
+            'orderNumber' => '12456789',
+        ],
+        [
             'subject'     => 'Trash',
             'date'        => '2014-05-04 12:43:00',
             'plainText'   => 'Random stuff see more at domain www.stuff.com',
             'type'        => null,
             'domainName'  => 'www.stuff.com',
-            'orderNumber' => null
-        );
+            'orderNumber' => null,
+        ],
+    ];
+
+    /**
+     * @param string $name
+     * @param array  $data
+     * @param string $dataName
+     */
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+
+        $this->imapHelper = new ImapHelper();
     }
 
 

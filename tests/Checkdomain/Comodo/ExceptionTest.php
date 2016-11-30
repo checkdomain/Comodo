@@ -17,7 +17,7 @@ class ExceptionTest extends AbstractTest
         try {
             $util->autoApplySSL(array());
         } catch (ArgumentException $e){
-            $this->assertEquals($e->getArgumentName(), 'field');
+            $this->assertEquals('field', $e->getArgumentName());
         }
     }
 
@@ -34,7 +34,7 @@ class ExceptionTest extends AbstractTest
             $util->autoApplySSL(array());
         } catch (AccountException $e){
             $this->assertEquals($e->getMessage(), 'Invalid Request');
-            $this->assertEquals($e->getCode(), '-15');
+            $this->assertEquals(-15, $e->getCode());
         }
     }
 }

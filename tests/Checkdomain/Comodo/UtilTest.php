@@ -35,7 +35,7 @@ class UtilTest extends AbstractTest
         $this->assertEquals("123456", $object->getExpectedDeliveryTime());
         $this->assertEquals("abc123456", $object->getCertificateID());
         $this->assertEquals("123456789", $object->getOrderNumber());
-        $this->assertEquals(false, $object->getPaid());
+        $this->assertFalse($object->getPaid());
     }
 
     /**
@@ -86,7 +86,7 @@ class UtilTest extends AbstractTest
 
         $return = $util->resendDCVEMail($params);
 
-        $this->assertEquals(true, $return);
+        $this->assertTrue($return);
     }
 
     /**
@@ -109,7 +109,7 @@ class UtilTest extends AbstractTest
 
         $return = $util->enterDcvCode($params);
 
-        $this->assertEquals(true, $return);
+        $this->assertTrue($return);
     }
 
     /**
@@ -127,7 +127,7 @@ class UtilTest extends AbstractTest
 
         $return = $util->autoRevokeSSL($params);
 
-        $this->assertEquals(true, $return);
+        $this->assertTrue($return);
     }
 
     /**
@@ -168,7 +168,7 @@ class UtilTest extends AbstractTest
 
         $return = $util->autoUpdateDCV($params);
 
-        $this->assertEquals(true, $return);
+        $this->assertTrue($return);
     }
 
     /**
@@ -189,7 +189,7 @@ class UtilTest extends AbstractTest
 
         $return = $util->autoUpdateDCV($params);
 
-        $this->assertEquals(true, $return);
+        $this->assertTrue($return);
     }
 
     /**
