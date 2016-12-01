@@ -104,9 +104,9 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      */
     protected function createGuzzleClient($responseString)
     {
-        $client   = $this->createMock(Client::class);
-        $response = $this->createMock(ResponseInterface::class);
-        $body     = $this->createMock(StreamInterface::class);
+        $client   = $this->getMockBuilder(Client::class)->getMock();
+        $response = $this->getMockBuilder(ResponseInterface::class)->getMock();
+        $body     = $this->getMockBuilder(StreamInterface::class)->getMock();
 
         $body
             ->expects($this->any())
