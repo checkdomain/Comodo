@@ -1,0 +1,82 @@
+[
+  {
+    "subject": "ORDER #12456789 - Your PositiveSSL Certificate for test.test.de",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Your PositiveSSL Certificate for test.test.de is attached!",
+    "type": "issued",
+    "domainName": "test.test.de",
+    "orderNumber": 12456789
+  },
+  {
+    "subject": "ORDER #12456789 - Your PositiveSSL Certificate for *.öäüäö.de",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Your PositiveSSL Certificate for *.öäüäö.de is attached!",
+    "type": "issued",
+    "domainName": "*.öäüäö.de",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "CONFIRMATION",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Thank you for placing your order. Your details have been passed to Comodo, who will be validating your order. Your Order Number is 12456789.\nPositiveSSL Certificate for\nwww.test.de. Please quote this Order Number in all correspondence. You have purchased:",
+    "type": "confirmation",
+    "domainName": "www.test.de",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Customer certificate expiry warning (1 days)",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Domain:- test.test.co.uk\n\nThe Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789",
+    "type": "1_expiry",
+    "domainName": "test.test.co.uk",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Customer certificate expiry warning (30 days)",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Domain:- test.test.co.uk\n\nThe Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789",
+    "type": "30_expiry",
+    "domainName": "test.test.co.uk",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Customer certificate expiry warning (60 days)",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Domain:- test.test.co.uk\n\nThe Issuance email address for this certificate was cdrobotcomodo@checkdomain.de and the order number was 12456789",
+    "type": "60_expiry",
+    "domainName": "test.test.co.uk",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Information Required Order 12456789",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Thank you for your recent order.\n\nWe have begun validating your information so that we can issue your order. The following is the account information you submitted:\n\nCompany: private\nDomain Name: test.test.de ",
+    "type": "information_required",
+    "domainName": "test.test.de",
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Trashmail",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Just some trash",
+    "type": null,
+    "domainName": null,
+    "orderNumber": null
+  },
+  {
+    "subject": "Trash for Order-Number: #12456789",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Just some trash",
+    "type": null,
+    "domainName": null,
+    "orderNumber": "12456789"
+  },
+  {
+    "subject": "Trash",
+    "date": "2014-05-04 12:43:00",
+    "plainText": "Random stuff see more at domain www.stuff.com",
+    "type": null,
+    "domainName": "www.stuff.com",
+    "orderNumber": null
+  }
+]
