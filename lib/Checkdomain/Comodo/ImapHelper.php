@@ -40,69 +40,55 @@ class ImapHelper
      */
     public function fetchMails(ImapAdapter $imap, array $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
     {
-        if ($folders === null) {
-            $folders = $imap->getFolders();
-        }
+        $folder = 'INBOX';
 
-        foreach ($folders as $folder) {
-            $imap->selectFolder($folder);
-            $result = $imap->search(array($search));
+        $imap->selectFolder($folder);
+        $result = $imap->search(array($search));
 
-            foreach ($result as $id) {
-                $message = $imap->getMessage($id);
+        foreach ($result as $id) {
+            $message = $imap->getMessage($id);
+
+            try {
+                $messages[$id]['id']     = $id;
+                $messages[$id]['folder'] = $folder;
+
+                // Zend-mail sometimes got problems, with incorrect e-mails
+                try {
+                    $messages[$id]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
+                } catch (\Exception $e) {
+                    $messages[$id]['subject'] = '-No subject-';
+                }
 
                 try {
-                    $messages[$id]['id']     = $id;
-                    $messages[$id]['folder'] = $folder;
-
-                    // Zend-mail sometimes got problems, with incorrect e-mails
-                    try {
-                        $messages[$id]['subject'] = utf8_decode($message->getHeader('subject', 'string'));
-                    } catch (\Exception $e) {
-                        $messages[$id]['subject'] = '-No subject-';
-                    }
-
-                    try {
-                        $messages[$id]['received'] = strtotime($message->getHeader('date', 'string'));
-                    } catch (\Exception $e) {
-                        $messages[$id]['received'] = '-No date-';
-                    }
-
-                    $messages[$id]['plainText']   = $this->getPlainText($message);
-                    $messages[$id]['attachments'] = $this->getAttachments($message);
-                    $messages[$id]['type']        = $this->getTypeOfMail($messages[$id]);
-
-                    if ($assume) {
-                        $messages[$id]['orderNumber'] = $this->assumeOrderNumber($messages[$id]);
-                        $messages[$id]['domainName']  = $this->assumeDomainName($messages[$id]);
-                    }
-
-                    $success = true;
-                    if (is_callable($callbackFunction)) {
-                        $success = $callbackFunction($id, $messages[$id]);
-                    }
-                } catch(\Exception $e) {
-                    // General decoding error -> removeMessage
-                    unset($messages[$id]);
-
-                    // Always mark as processed
-                    $success = true;
+                    $messages[$id]['received'] = strtotime($message->getHeader('date', 'string'));
+                } catch (\Exception $e) {
+                    $messages[$id]['received'] = '-No date-';
                 }
 
-                if ($markProcessed && $success) {
-                    $this->markProcessed($imap, $message, $id);
+                $messages[$id]['plainText']   = $this->getPlainText($message);
+                $messages[$id]['attachments'] = $this->getAttachments($message);
+                $messages[$id]['type']        = $this->getTypeOfMail($messages[$id]);
+
+                if ($assume) {
+                    $messages[$id]['orderNumber'] = $this->assumeOrderNumber($messages[$id]);
+                    $messages[$id]['domainName']  = $this->assumeDomainName($messages[$id]);
                 }
+
+                $success = true;
+                if (is_callable($callbackFunction)) {
+                    $success = $callbackFunction($id, $messages[$id]);
+                }
+            } catch(\Exception $e) {
+                // General decoding error -> removeMessage
+                unset($messages[$id]);
+
+                // Always mark as processed
+                $success = true;
             }
 
-            $messages = $this->fetchMails(
-                $imap,
-                $messages,
-                $search,
-                $folder,
-                $markProcessed,
-                $assume,
-                $callbackFunction
-            );
+            if ($markProcessed && $success) {
+                $this->markProcessed($imap, $message, $id);
+            }
         }
 
         return $messages;
@@ -231,7 +217,6 @@ class ImapHelper
 
         return strip_tags($text);
     }
-
 
     /**
      * @param Message $message
