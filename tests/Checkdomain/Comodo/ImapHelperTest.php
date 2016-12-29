@@ -160,7 +160,7 @@ class ImapHelperTest extends AbstractTest
 
             return [
                 'id'          => $i++,
-                'folder'      => $this->createZendImapStorageFolder(),
+                'folder'      => 'INBOX',
                 'subject'     => $message['subject'],
                 'received'    => strtotime($message['date']),
                 'plainText'   => $message['plainText'],

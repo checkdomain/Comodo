@@ -38,28 +38,10 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 
         $imapExtension
             ->expects($this->any())
-            ->method('getFolders')
-            ->will($this->returnValue([$this->createZendImapStorageFolder()]));
-
-        $imapExtension
-            ->expects($this->any())
             ->method('selectFolder')
             ->will($this->returnValue(true));
 
         return $imapExtension;
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Zend\Mail\Storage\Folder
-     */
-    protected function createZendImapStorageFolder()
-    {
-        return $this
-            ->getMockBuilder(Folder::class)
-            ->setConstructorArgs(['INBOX'])
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->getMock();
     }
 
     /**
