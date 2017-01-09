@@ -589,21 +589,22 @@ class Util
     public function getMails($domainName, $orderNumbers = null, \Closure $callbackFunction = null)
     {
         $orList    = ' OR ';
-        $whereList = ' BODY "' . $domainName . '"';
-        $whereList .= ' SUBJECT "' . $domainName . '"';
+        $whereList = ' BODY "'.$domainName .'"';
+        $whereList .= ' SUBJECT "'.$domainName .'"';
 
         if (is_array($orderNumbers)) {
             foreach ($orderNumbers as $orderNumber) {
                 $orList .= ' OR OR ';
-                $whereList .= ' BODY "' . $orderNumber . '"';
-                $whereList .= ' SUBJECT "' . $orderNumber . '"';
+                $whereList .= ' BODY "'.$orderNumber.'"';
+                $whereList .= ' SUBJECT "'.$orderNumber.'"';
             }
         }
 
-        $search = $orList . " " . $whereList;
+        $search = $orList." ".$whereList;
 
-        return $this->imapHelper
-            ->fetchMails($this->imapAdapter, array(), $search, null, false, false, $callbackFunction);
+        return $this
+            ->imapHelper
+            ->fetchMails($this->imapAdapter, $search, false, false, $callbackFunction);
     }
 
     /**
@@ -620,9 +621,7 @@ class Util
             ->imapHelper
             ->fetchMails(
                 $this->imapAdapter,
-                array(),
                 $search,
-                null,
                 $markProcessed,
                 true,
                 $callbackFunction
