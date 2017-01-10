@@ -29,16 +29,14 @@ class ImapHelper
      *  Fetches the mail recursively, through the folders.
      *
      * @param ImapAdapter $imap             imap helper class
-     * @param array       $messages         (internal)
      * @param string      $search           imap-searchterm
-     * @param Folder      $folders          the subfolders
      * @param bool        $markProcessed    Sets the flag as processed
      * @param bool        $assume           Assumes domainName / order-Number in the mail
      * @param \Closure    $callbackFunction callback
      *
      * @return array
      */
-    public function fetchMails(ImapAdapter $imap, array $messages, $search, Folder $folders = null, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
+    public function fetchMails(ImapAdapter $imap, $search, $markProcessed = true, $assume = false, \Closure $callbackFunction = null)
     {
         $folder = 'INBOX';
 
@@ -78,7 +76,7 @@ class ImapHelper
                 if (is_callable($callbackFunction)) {
                     $success = $callbackFunction($id, $messages[$id]);
                 }
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 // General decoding error -> removeMessage
                 unset($messages[$id]);
 

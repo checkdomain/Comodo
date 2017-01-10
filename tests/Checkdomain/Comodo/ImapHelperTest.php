@@ -112,7 +112,7 @@ class ImapHelperTest extends AbstractTest
                 base64_decode(file_get_contents(__DIR__ . '/../../data/messages/raw/multipart'))
             )));
 
-        $messages = $this->imapHelper->fetchMails($imapAdapter, [], null, null, true, true);
+        $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
         $message = $messages[0];
 
         $this->assertEquals('ORDER #12345678 - CONFIRMATION', $message['subject']);
@@ -142,7 +142,7 @@ class ImapHelperTest extends AbstractTest
                 base64_decode(file_get_contents(__DIR__ . '/../../data/messages/raw/with-attachment'))
             )));
 
-        $messages = $this->imapHelper->fetchMails($imapAdapter, [], null, null, true, true);
+        $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
         $attachment = $messages[0]['attachments'][0];
 
         $this->assertEquals('application/x-zip-compressed', $attachment['mime']);
@@ -186,7 +186,7 @@ class ImapHelperTest extends AbstractTest
             }));
 
 
-        $messages = $this->imapHelper->fetchMails($imapAdapter, [], null, null, true, true);
+        $messages = $this->imapHelper->fetchMails($imapAdapter, [], true, true);
 
         $this->assertEquals($asserts, $messages);
     }
