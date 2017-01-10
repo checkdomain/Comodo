@@ -22,20 +22,20 @@ class UtilTest extends AbstractTest
         ])));
 
         $result = $util->autoApplySSL([
-            "test"                => "Y",
-            "product"             => 287,
-            "serverSoftware"      => 2,
-            "csr"                 => ("-----BEGIN CERTIFICATE REQUEST-----base64-----END CERTIFICATE REQUEST-----"),
-            "isCustomerValidated" => "Y",
-            "showCertificateID"   => "Y",
-            "days"                => 365,
+            'test'                => 'Y',
+            'product'             => 287,
+            'serverSoftware'      => 2,
+            'csr'                 => ('-----BEGIN CERTIFICATE REQUEST-----base64-----END CERTIFICATE REQUEST-----'),
+            'isCustomerValidated' => 'Y',
+            'showCertificateID'   => 'Y',
+            'days'                => 365,
         ]);
 
         $this->assertInstanceOf(AutoApplyResult::class, $result);
-        $this->assertEquals("12.98", $result->getTotalCost());
-        $this->assertEquals("123456", $result->getExpectedDeliveryTime());
-        $this->assertEquals("abc123456", $result->getCertificateID());
-        $this->assertEquals("123456789", $result->getOrderNumber());
+        $this->assertEquals('12.98', $result->getTotalCost());
+        $this->assertEquals('123456', $result->getExpectedDeliveryTime());
+        $this->assertEquals('abc123456', $result->getCertificateID());
+        $this->assertEquals('123456789', $result->getOrderNumber());
         $this->assertFalse($result->getPaid());
     }
 
@@ -45,21 +45,21 @@ class UtilTest extends AbstractTest
     public function testGetDCVEMailAddressList()
     {
         // simulated response Text
-        $responseText = "0\n"
-            . "domain_name	www.test-domain.org\n"
-            . "whois_email	 support@test-domain.org\n"
-            . "level2_email	 admin@test-domain.org\n"
-            . "level2_email	 postmaster@test-domain.org\n"
-            . "level3_email	 admin@www.test-domain.org\n"
-            . "level3_email	 postmaster@www.test-domain.org\n";
+        $responseText = '0'.chr(10)
+            .'domain_name	www.test-domain.org'.chr(10)
+            .'whois_email	 support@test-domain.org'.chr(10)
+            .'level2_email	 admin@test-domain.org'.chr(10)
+            .'level2_email	 postmaster@test-domain.org'.chr(10)
+            .'level3_email	 admin@www.test-domain.org'.chr(10)
+            .'level3_email	 postmaster@www.test-domain.org'.chr(10);
 
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
-        $result = $util->getDCVEMailAddressList(["domainName" => "www.test-domain.org"]);
+        $result = $util->getDCVEMailAddressList(['domainName' => 'www.test-domain.org']);
 
         $this->assertInstanceOf(GetDCVEMailAddressListResult::class, $result);
-        $this->assertEquals(["support@test-domain.org"], $result->getWhoisEmail());
-        $this->assertEquals("www.test-domain.org", $result->getDomainName());
+        $this->assertEquals(['support@test-domain.org'], $result->getWhoisEmail());
+        $this->assertEquals('www.test-domain.org', $result->getDomainName());
         $this->assertEquals(['admin@test-domain.org', 'postmaster@test-domain.org'], $result->getLevel2Emails());
         $this->assertEquals(
             ['admin@www.test-domain.org', 'postmaster@www.test-domain.org'],
@@ -75,8 +75,8 @@ class UtilTest extends AbstractTest
         $util = $this->createUtil($this->createGuzzleClient('errorCode=0'));
 
         $this->assertTrue($util->resendDCVEMail([
-            "orderNumber"     => "1234567",
-            "dcvEmailAddress" => "webmaster@tobias-nitsche.de",
+            'orderNumber'     => '1234567',
+            'dcvEmailAddress' => 'webmaster@tobias-nitsche.de',
         ]));
     }
 
@@ -86,16 +86,16 @@ class UtilTest extends AbstractTest
     public function testEnterDCVCode()
     {
         // simulated response Text
-        $responseText = "<html><body><p>You have entered the correct Domain Control Validation code. "
-            . "Your certificate will now be issued and emailed to you shortly. "
-            . "Please close this window now."
-            . "</p></body></html>";
+        $responseText = '<html><body><p>You have entered the correct Domain Control Validation code. '
+            .'Your certificate will now be issued and emailed to you shortly. '
+            .'Please close this window now.'
+            .'</p></body></html>';
 
         $util = $this->createUtil($this->createGuzzleClient($responseText));
 
         $this->assertTrue($util->enterDcvCode([
-            "orderNumber" => "1234567",
-            "dcvCode"     => "testtesttest",
+            'orderNumber' => '1234567',
+            'dcvCode'     => 'testtesttest',
         ]));
     }
 
@@ -106,7 +106,7 @@ class UtilTest extends AbstractTest
     {
         $util = $this->createUtil($this->createGuzzleClient('errorCode=0'));
 
-        $this->assertTrue($util->autoRevokeSSL(["orderNumber" => "1234567"]));
+        $this->assertTrue($util->autoRevokeSSL(['orderNumber' => '1234567']));
     }
 
     /**
@@ -316,8 +316,8 @@ class UtilTest extends AbstractTest
      */
     public function testCollectSslPeriod()
     {
-        $caCertificate = ['-----BEGIN CERTIFICATE-----' .PHP_EOL . '123' .  PHP_EOL . '-----END CERTIFICATE-----'];
-        $certificate = '-----BEGIN CERTIFICATE-----' . PHP_EOL .'234' .  PHP_EOL . '-----END CERTIFICATE-----';
+        $caCertificate = ['-----BEGIN CERTIFICATE-----'.chr(10).'123'.chr(10).'-----END CERTIFICATE-----'];
+        $certificate = '-----BEGIN CERTIFICATE-----'.chr(10).'234'.chr(10). '-----END CERTIFICATE-----';
 
         $util = $this->createUtil($this->createGuzzleClient(http_build_query([
             'errorCode'         => 1,

@@ -528,8 +528,8 @@ class CollectSslResult extends AbstractResult
     protected function addDelimiter($crtContent)
     {
         $crtContent =
-            '-----BEGIN CERTIFICATE-----' . "\n" .
-            $crtContent . "\n" .
+            '-----BEGIN CERTIFICATE-----'.chr(10).
+            $crtContent.chr(10).
             '-----END CERTIFICATE-----';
 
         return $crtContent;
@@ -542,7 +542,7 @@ class CollectSslResult extends AbstractResult
      */
     protected function wrapCrt($crtContent)
     {
-        $crtContent = wordwrap($crtContent, 64, PHP_EOL, true);
+        $crtContent = wordwrap($crtContent, 64, chr(10), true);
 
         return $crtContent;
     }

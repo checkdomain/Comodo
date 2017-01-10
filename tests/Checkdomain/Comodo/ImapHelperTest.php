@@ -5,6 +5,9 @@ use Checkdomain\Comodo\ImapExtension;
 use Checkdomain\Comodo\ImapHelper;
 use Zend\Mail\Storage\Message;
 
+/**
+ * Class ImapHelperTest
+ */
 class ImapHelperTest extends AbstractTest
 {
     /**
@@ -27,7 +30,7 @@ class ImapHelperTest extends AbstractTest
         parent::__construct($name, $data, $dataName);
 
         $this->imapHelper = new ImapHelper();
-        $this->messages = json_decode(file_get_contents(__DIR__ . '/../../data/messages/messages.json'), true);
+        $this->messages = json_decode(file_get_contents(__DIR__.'/../../data/messages/messages.json'), true);
     }
 
 
@@ -81,16 +84,6 @@ class ImapHelperTest extends AbstractTest
     }
 
     /**
-     * @param string $raw
-     *
-     * @return Message
-     */
-    protected function createImapRawMessage($raw)
-    {
-        return new Message(['raw' => $raw]);
-    }
-
-    /**
      * This test is only for validating correct decoding of the message (subject/plaintext/received)
      */
     public function testMailParse()
@@ -109,7 +102,7 @@ class ImapHelperTest extends AbstractTest
             ->expects($this->any())
             ->method('getMessage')
             ->will($this->returnValue($this->createImapRawMessage(
-                base64_decode(file_get_contents(__DIR__ . '/../../data/messages/raw/multipart'))
+                base64_decode(file_get_contents(__DIR__.'/../../data/messages/raw/multipart'))
             )));
 
         $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
@@ -117,7 +110,7 @@ class ImapHelperTest extends AbstractTest
 
         $this->assertEquals('ORDER #12345678 - CONFIRMATION', $message['subject']);
         $this->assertEquals(1404914391, $message['received']);
-        $this->assertEquals("test\n\n", $message['plainText']);
+        $this->assertEquals('test'.chr(10).chr(10), $message['plainText']);
     }
 
     /**
@@ -139,7 +132,7 @@ class ImapHelperTest extends AbstractTest
             ->expects($this->any())
             ->method('getMessage')
             ->will($this->returnValue($this->createImapRawMessage(
-                base64_decode(file_get_contents(__DIR__ . '/../../data/messages/raw/with-attachment'))
+                base64_decode(file_get_contents(__DIR__.'/../../data/messages/raw/with-attachment'))
             )));
 
         $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
@@ -189,5 +182,15 @@ class ImapHelperTest extends AbstractTest
         $messages = $this->imapHelper->fetchMails($imapAdapter, [], true, true);
 
         $this->assertEquals($asserts, $messages);
+    }
+
+    /**
+     * @param string $raw
+     *
+     * @return Message
+     */
+    protected function createImapRawMessage($raw)
+    {
+        return new Message(['raw' => $raw]);
     }
 }

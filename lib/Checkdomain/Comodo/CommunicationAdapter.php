@@ -118,15 +118,17 @@ class CommunicationAdapter
 
         // Merging post-data
         $fields                  = array();
-        $fields["loginName"]     = $this->getAccount()->getLoginName();
-        $fields["loginPassword"] = $this->getAccount()->getLoginPassword();
+        $fields['loginName']     = $this->getAccount()->getLoginName();
+        $fields['loginPassword'] = $this->getAccount()->getLoginPassword();
         $fields                  = array_merge($fields, $params);
 
         // Sending request
         $client   = $this->getClient();
-        $response = $client->request('POST', $url, [
-            'form_params' => $fields
-        ]);
+        $response = $client->request(
+            'POST',
+            $url,
+            ['form_params' => $fields]
+        );
         $query    = http_build_query($params);
 
         // Getting response body
@@ -150,11 +152,11 @@ class CommunicationAdapter
     protected function preSendToApiCheck()
     {
         if ($this->getAccount() === null) {
-            throw new \Exception("Please provided an account");
+            throw new \Exception('Please provided an account');
         }
 
         if (!$this->getAccount()->isValid()) {
-            throw new \Exception("Please provided valid account");
+            throw new \Exception('Please provided valid account');
         }
 
         return true;
@@ -172,22 +174,21 @@ class CommunicationAdapter
     protected function decodeNewLineEncodedResponse($responseString, $requestQuery, array $forceArray = array())
     {
         // Splitting response body
-        $parts = explode("\n", $responseString);
+        $parts = explode(chr(10), $responseString);
 
         // Getting the status
         $status = trim($parts[0]);
 
-        $responseArray = array();
-
+        $responseArray = [];
 
         // Valid answer?
         if (is_numeric($status)) {
             // Successful?
-            if ($status != "0") {
-                $responseArray["errorCode"]    = $status;
-                $responseArray["errorMessage"] = trim($parts[1]);
+            if ($status != '0') {
+                $responseArray['errorCode']    = $status;
+                $responseArray['errorMessage'] = trim($parts[1]);
             } else {
-                $responseArray["errorCode"]    = $status;
+                $responseArray['errorCode']    = $status;
 
                 $partCount = count($parts);
                 for ($i = 1; $i < $partCount; $i++) {
@@ -213,8 +214,8 @@ class CommunicationAdapter
                 }
             }
         } else {
-            $responseArray["errorCode"]    = "";
-            $responseArray["errorMessage"] = trim($responseString);
+            $responseArray['errorCode']    = '';
+            $responseArray['errorMessage'] = trim($responseString);
         }
 
         foreach ($forceArray as $value) {
@@ -223,8 +224,8 @@ class CommunicationAdapter
             }
         }
 
-        $responseArray["responseString"] = $responseString;
-        $responseArray["requestQuery"]   = $requestQuery;
+        $responseArray['responseString'] = $responseString;
+        $responseArray['requestQuery']   = $requestQuery;
 
         return $responseArray;
     }
@@ -252,7 +253,7 @@ class CommunicationAdapter
 
         if (!empty($forceArray)) {
             foreach ($forceArray as $param) {
-                $responseString = str_replace($param . '=', $param .'[]=', $responseString);
+                $responseString = str_replace($param.'=', $param.'[]=', $responseString);
             }
         }
 
@@ -270,8 +271,8 @@ class CommunicationAdapter
             }
         }
 
-        $responseArray["responseString"] = $responseString;
-        $responseArray["requestQuery"]   = $requestQuery;
+        $responseArray['responseString'] = $responseString;
+        $responseArray['requestQuery']   = $requestQuery;
 
         if (!isset($responseArray['errorCode'])) {
             $responseArray['errorCode'] = 99;

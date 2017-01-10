@@ -12,8 +12,24 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Zend\Mail\Storage\Folder;
 
+/**
+ * Class AbstractTest
+ */
 abstract class AbstractTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapHelper
+     */
+    public function createImapHelper()
+    {
+        return $this
+            ->getMockBuilder(ImapHelper::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableAutoload()
+            ->getMock();
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapAdapter
      */
@@ -64,18 +80,6 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
         return new Util($communicationAdapter, $imapAdapter, $imapHelper);
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapHelper
-     */
-    public function createImapHelper()
-    {
-        return $this
-            ->getMockBuilder(ImapHelper::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableAutoload()
-            ->getMock();
-    }
 
     /**
      * Creates a class to simulate Requests, and return response String for testing purposes

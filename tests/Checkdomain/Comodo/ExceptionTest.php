@@ -4,6 +4,9 @@ namespace Checkdomain\Comodo\Tests;
 use Checkdomain\Comodo\Model\Exception\AccountException;
 use Checkdomain\Comodo\Model\Exception\ArgumentException;
 
+/**
+ * Class ExceptionTest
+ */
 class ExceptionTest extends AbstractTest
 {
     /**

@@ -21,18 +21,18 @@ use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
  */
 class Util
 {
-    const COMODO_AUTO_APPLY_URL               = "https://secure.comodo.net/products/!AutoApplySSL";
-    const COMODO_AUTO_REVOKE_URL              = "https://secure.comodo.net/products/!AutoRevokeSSL";
-    const COMODO_DCV_MAIL_URL                 = "https://secure.comodo.net/products/!GetDCVEmailAddressList";
-    const COMODO_DCV_RESEND_URL               = "https://secure.comodo.net/products/!ResendDCVEmail";
-    const COMODO_AUTO_UPDATE_DCV_URL          = "https://secure.comodo.net/products/!AutoUpdateDCV";
-    const COMODO_PROVIDE_EV_DETAILS_URL       = "https://secure.comodo.net/products/!ProvideEVDetails";
-    const COMODO_MDC_DOMAIN_DETAILS_URL       = "https://secure.comodo.net/products/!GetMDCDomainDetails";
-    const COMODO_AUTO_REPLACE_URL             = "https://secure.comodo.net/products/!AutoReplaceSSL";
-    const COMODO_COLLECT_SSL_URL              = "https://secure.comodo.net/products/download/CollectSSL";
-    const COMODO_UPDATE_USER_EV_CLICK_THROUGH = "https://secure.comodo.net/products/!UpdateUserEvClickThrough";
+    const COMODO_AUTO_APPLY_URL               = 'https://secure.comodo.net/products/!AutoApplySSL';
+    const COMODO_AUTO_REVOKE_URL              = 'https://secure.comodo.net/products/!AutoRevokeSSL';
+    const COMODO_DCV_MAIL_URL                 = 'https://secure.comodo.net/products/!GetDCVEmailAddressList';
+    const COMODO_DCV_RESEND_URL               = 'https://secure.comodo.net/products/!ResendDCVEmail';
+    const COMODO_AUTO_UPDATE_DCV_URL          = 'https://secure.comodo.net/products/!AutoUpdateDCV';
+    const COMODO_PROVIDE_EV_DETAILS_URL       = 'https://secure.comodo.net/products/!ProvideEVDetails';
+    const COMODO_MDC_DOMAIN_DETAILS_URL       = 'https://secure.comodo.net/products/!GetMDCDomainDetails';
+    const COMODO_AUTO_REPLACE_URL             = 'https://secure.comodo.net/products/!AutoReplaceSSL';
+    const COMODO_COLLECT_SSL_URL              = 'https://secure.comodo.net/products/download/CollectSSL';
+    const COMODO_UPDATE_USER_EV_CLICK_THROUGH = 'https://secure.comodo.net/products/!UpdateUserEvClickThrough';
 
-    const COMODO_DCV_CODE_URL = "https://secure.comodo.net/products/EnterDCVCode2";
+    const COMODO_DCV_CODE_URL = 'https://secure.comodo.net/products/EnterDCVCode2';
 
     /**
      * @var CommunicationAdapter
@@ -142,8 +142,8 @@ class Util
     public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"]    = CommunicationAdapter::RESPONSE_URL_ENCODED;
-        $params["showCertificateID"] = "Y";
+        $params['responseFormat']    = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['showCertificateID'] = 'Y';
 
         // Send request
         $arr = $this
@@ -151,10 +151,10 @@ class Util
             ->sendToApi(self::COMODO_AUTO_APPLY_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
 
         // Successful
-        if ($arr["errorCode"] == 1 || $arr["errorCode"] == 0) {
+        if ($arr['errorCode'] == 1 || $arr['errorCode'] == 0) {
             $result = new AutoApplyResult();
 
-            if ($arr["errorCode"] == 0) {
+            if ($arr['errorCode'] == 0) {
                 $paid = true;
             } else {
                 $paid = false;
@@ -162,10 +162,10 @@ class Util
 
             $result
                 ->setPaid($paid)
-                ->setCertificateID($arr["certificateID"])
-                ->setExpectedDeliveryTime($arr["expectedDeliveryTime"])
-                ->setOrderNumber($arr["orderNumber"])
-                ->setTotalCost($arr["totalCost"])
+                ->setCertificateID($arr['certificateID'])
+                ->setExpectedDeliveryTime($arr['expectedDeliveryTime'])
+                ->setOrderNumber($arr['orderNumber'])
+                ->setTotalCost($arr['totalCost'])
                 ->setRequestQuery($arr['requestQuery']);
 
             return $result;
@@ -197,7 +197,7 @@ class Util
             );
 
         // Successful
-        if ($arr["errorCode"] == 0) {
+        if ($arr['errorCode'] == 0) {
             $result = new UpdateUserEvClickThroughResult();
 
             $result
@@ -227,23 +227,24 @@ class Util
     public function autoReplaceSSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
         $arr = $this
             ->communicationAdapter
             ->sendToApi(
                 self::COMODO_AUTO_REPLACE_URL,
-                $params,CommunicationAdapter::RESPONSE_URL_ENCODED
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
             );
 
         // Successful
-        if ($arr["errorCode"] == 0) {
+        if ($arr['errorCode'] == 0) {
             $result = new AutoReplaceResult();
 
             $result
-                ->setCertificateID($arr["certificateID"])
-                ->setExpectedDeliveryTime($arr["expectedDeliveryTime"]);
+                ->setCertificateID($arr['certificateID'])
+                ->setExpectedDeliveryTime($arr['expectedDeliveryTime']);
 
             return $result;
         } else {
@@ -268,7 +269,7 @@ class Util
     public function autoRevokeSSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         return $this->sendBooleanRequest(
             self::COMODO_AUTO_REVOKE_URL,
@@ -324,7 +325,7 @@ class Util
         $forceArray = array('caCertificate');
 
         // Two choices, we want url-encoded
-        $params["responseFormat"] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
 
         // Send request
         $arr = $this
@@ -338,7 +339,7 @@ class Util
             );
 
         // Successful
-        if ($arr["errorCode"] >= 0) {
+        if ($arr['errorCode'] >= 0) {
             $result = new CollectSslResult();
 
             $this->fill($result, $arr, array('notBefore', 'notAfter'));
@@ -347,31 +348,6 @@ class Util
         } else {
             throw $this->createException($arr);
         }
-    }
-
-    /**
-     * @param CollectSslResult $object
-     * @param array            $arr
-     * @param array            $timestampFields
-     *
-     * @return $this
-     */
-    protected function fill(CollectSslResult $object, array $arr, array $timestampFields = array())
-    {
-        foreach ($arr as $key => $value) {
-            if (in_array($key, $timestampFields)) {
-                $value = new \DateTime('@' . $value);
-            }
-
-            $function = 'set' . ucfirst($key);
-
-            // For example setErrorCode does not exists, so check before
-            if(method_exists($object, $function)) {
-                call_user_func(array($object, $function), $value);
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -428,12 +404,12 @@ class Util
      * @param array $params
      *
      * @return GetDCVEMailAddressListResult
-     *
-     * @throws Model\Exception\AccountException
-     * @throws Model\Exception\ArgumentException
-     * @throws Model\Exception\RequestException
-     * @throws Model\Exception\UnknownApiException
-     * @throws Model\Exception\UnknownException
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
      */
     public function getDCVEMailAddressList(array $params)
     {
@@ -451,17 +427,17 @@ class Util
                 $forceArray
             );
 
-        if ($responseArray["errorCode"] == 0) {
+        if ($responseArray['errorCode'] == 0) {
             $result = new GetDCVEMailAddressListResult();
 
             $result
-                ->setDomainName($responseArray["domain_name"])
-                ->setWhoisEmail($responseArray["whois_email"])
-                ->setLevel2Emails($responseArray["level2_email"])
+                ->setDomainName($responseArray['domain_name'])
+                ->setWhoisEmail($responseArray['whois_email'])
+                ->setLevel2Emails($responseArray['level2_email'])
                 ->setRequestQuery($responseArray['requestQuery']);
 
-            if (isset($responseArray["level3_email"])) {
-                $result->setLevel3Emails($responseArray["level3_email"]);
+            if (isset($responseArray['level3_email'])) {
+                $result->setLevel3Emails($responseArray['level3_email']);
             }
 
             return $result;
@@ -497,13 +473,13 @@ class Util
                 CommunicationAdapter::RESPONSE_URL_ENCODED
             );
 
-        if ($responseArray["errorCode"] == 0) {
+        if ($responseArray['errorCode'] == 0) {
             $result = new GetMDCDomainDetailsResult();
 
             $result
-                ->setDomainName($responseArray["1_domainName"])
-                ->setDcvMethod($responseArray["1_dcvMethod"])
-                ->setDcvStatus($responseArray["1_dcvStatus"]);
+                ->setDomainName($responseArray['1_domainName'])
+                ->setDcvMethod($responseArray['1_dcvMethod'])
+                ->setDcvStatus($responseArray['1_dcvStatus']);
 
             return $result;
         } else {
@@ -523,11 +499,11 @@ class Util
     public function enterDCVCode(array $params)
     {
         // Check parameters
-        if (!isset($params["dcvCode"])) {
+        if (!isset($params['dcvCode'])) {
             throw new ArgumentException(-3, 'Please provide an order-number', 'dcvCode', '');
         }
 
-        if (!isset($params["orderNumber"])) {
+        if (!isset($params['orderNumber'])) {
             throw new ArgumentException(-3, 'Please provide an order-number', 'orderNumber', '');
         }
 
@@ -537,15 +513,165 @@ class Util
             ->sendToWebsite(self::COMODO_DCV_CODE_URL, $params);
 
         // Decode answer from website
-        if (stristr($responseString, "You have entered the correct Domain Control Validation code") !== false) {
+        if (stristr($responseString, 'You have entered the correct Domain Control Validation code') !== false) {
             return true;
-        } else if (stristr($responseString, 'the certificate has already been issued') !== false) {
+        } elseif (stristr($responseString, 'the certificate has already been issued') !== false) {
             throw new ArgumentException(-104, 'The certificate has already been issued', 'certificate', $responseString);
-        } else if (stristr($responseString, 'Invalid Validation Code!') !== false) {
+        } elseif (stristr($responseString, 'Invalid Validation Code!') !== false) {
             throw new ArgumentException(-103, 'Invalid Validation Code', 'validation-code', $responseString);
         } else {
             throw new UnknownException(99, 'UnknownException', $responseString);
         }
+    }
+
+    /**
+     * @param string   $domainName
+     * @param null     $orderNumbers
+     * @param \Closure $callbackFunction
+     *
+     * @return array
+     */
+    public function getMails($domainName, $orderNumbers = null, \Closure $callbackFunction = null)
+    {
+        $orList    = ' OR ';
+        $whereList = ' BODY "'.$domainName.'"';
+        $whereList .= ' SUBJECT "'.$domainName.'"';
+
+        if (is_array($orderNumbers)) {
+            foreach ($orderNumbers as $orderNumber) {
+                $orList .= ' OR OR ';
+                $whereList .= ' BODY "'.$orderNumber.'"';
+                $whereList .= ' SUBJECT "'.$orderNumber.'"';
+            }
+        }
+
+        $search = $orList.' '.$whereList;
+
+        return $this
+            ->imapHelper
+            ->fetchMails($this->imapAdapter, $search, false, false, $callbackFunction);
+    }
+
+    /**
+     * @param bool     $markProcessed
+     * @param \Closure $callbackFunction
+     *
+     * @return array
+     */
+    public function getUnprocessedMails($markProcessed = true, \Closure $callbackFunction = null)
+    {
+        $search = ' NOT KEYWORD "'.ImapHelper::PROCESSED_FLAG.'"';
+
+        return $this
+            ->imapHelper
+            ->fetchMails(
+                $this->imapAdapter,
+                $search,
+                $markProcessed,
+                true,
+                $callbackFunction
+            );
+    }
+
+    /**
+     * Function to create an exception for API errorcodes
+     *
+     * @param array $responseArray
+     *
+     * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    protected function createException(array $responseArray)
+    {
+        switch ($responseArray['errorCode']) {
+            case -1: // Not using https:
+            case -17: // Wrong HTTP-method
+                return new RequestException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    $responseArray['responseString']
+                );
+
+            case -2: // unrecognized argument
+            case -3: // missing argument
+            case -4: // invalid argument
+            case -7: // invalid ISO Country
+            case -18: // Name = Fully-Qualified Domain Name
+            case -35: // Name = = IP
+            case -19: // Name = = Accessible IP
+                return new ArgumentException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    ((isset($responseArray['errorItem'])) ? $responseArray['errorItem'] : null),
+                    $responseArray['responseString']
+                );
+
+            case -16: // Permission denied
+            case -15: // insufficient credits
+                return new AccountException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    $responseArray['responseString']
+                );
+
+            case -5: // contains wildcard
+            case -6: // no wildcard, but must have
+            case -8: // missing field
+            case -9: // base64 decode exception
+            case -10: // decode exception
+            case -11: // unsupported algorithm
+            case -12: // invalid signature
+            case -13: // unsupported key size
+            case -20: // Already rejected / Order relevated
+            case -21: // Already revoked
+            case -26: // current being issued
+            case -40: // key compromised
+                return new CSRException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    $responseArray['responseString']
+                );
+
+            case -14:
+                return new UnknownApiException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    $responseArray['responseString']
+                );
+
+            default:
+                return new UnknownException(
+                    $responseArray['errorCode'],
+                    $responseArray['errorMessage'],
+                    $responseArray['responseString']
+                );
+        }
+    }
+
+    /**
+     * @param CollectSslResult $object
+     * @param array            $arr
+     * @param array            $timestampFields
+     *
+     * @return $this
+     */
+    protected function fill(CollectSslResult $object, array $arr, array $timestampFields = array())
+    {
+        foreach ($arr as $key => $value) {
+            if (in_array($key, $timestampFields)) {
+                $value = new \DateTime('@'.$value);
+            }
+
+            $function = 'set'.ucfirst($key);
+
+            // For example setErrorCode does not exists, so check before
+            if (method_exists($object, $function)) {
+                call_user_func(array($object, $function), $value);
+            }
+        }
+
+        return $this;
     }
 
     /**
@@ -572,135 +698,10 @@ class Util
                 $type
             );
 
-        if ($responseArray["errorCode"] == 0) {
+        if ($responseArray['errorCode'] == 0) {
             return true;
         } else {
             throw $this->createException($responseArray);
-        }
-    }
-
-    /**
-     * @param string   $domainName
-     * @param null     $orderNumbers
-     * @param \Closure $callbackFunction
-     *
-     * @return array
-     */
-    public function getMails($domainName, $orderNumbers = null, \Closure $callbackFunction = null)
-    {
-        $orList    = ' OR ';
-        $whereList = ' BODY "'.$domainName .'"';
-        $whereList .= ' SUBJECT "'.$domainName .'"';
-
-        if (is_array($orderNumbers)) {
-            foreach ($orderNumbers as $orderNumber) {
-                $orList .= ' OR OR ';
-                $whereList .= ' BODY "'.$orderNumber.'"';
-                $whereList .= ' SUBJECT "'.$orderNumber.'"';
-            }
-        }
-
-        $search = $orList." ".$whereList;
-
-        return $this
-            ->imapHelper
-            ->fetchMails($this->imapAdapter, $search, false, false, $callbackFunction);
-    }
-
-    /**
-     * @param bool     $markProcessed
-     * @param \Closure $callbackFunction
-     *
-     * @return array
-     */
-    public function getUnprocessedMails($markProcessed = true, \Closure $callbackFunction = null)
-    {
-        $search = ' NOT KEYWORD "' . ImapHelper::PROCESSED_FLAG . '"';
-
-        return $this
-            ->imapHelper
-            ->fetchMails(
-                $this->imapAdapter,
-                $search,
-                $markProcessed,
-                true,
-                $callbackFunction
-            );
-    }
-
-    /**
-     * Function to create an exception for API errorcodes
-     *
-     * @param array $responseArray
-     *
-     * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
-     *
-     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
-     */
-    protected function createException(array $responseArray)
-    {
-        switch ($responseArray["errorCode"]) {
-            case -1: // Not using https:
-            case -17: // Wrong HTTP-method
-                return new RequestException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    $responseArray["responseString"]
-                );
-
-            case -2: // unrecognized argument
-            case -3: // missing argument
-            case -4: // invalid argument
-            case -7: // invalid ISO Country
-            case -18: // Name = Fully-Qualified Domain Name
-            case -35: // Name = = IP
-            case -19: // Name = = Accessible IP
-                return new ArgumentException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    ((isset($responseArray["errorItem"])) ? $responseArray["errorItem"] : null),
-                    $responseArray["responseString"]
-                );
-
-            case -16: // Permission denied
-            case -15: // insufficient credits
-                return new AccountException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    $responseArray["responseString"]
-                );
-
-            case -5: // contains wildcard
-            case -6: // no wildcard, but must have
-            case -8: // missing field
-            case -9: // base64 decode exception
-            case -10: // decode exception
-            case -11: // unsupported algorithm
-            case -12: // invalid signature
-            case -13: // unsupported key size
-            case -20: // Already rejected / Order relevated
-            case -21: // Already revoked
-            case -26: // current being issued
-            case -40: // key compromised
-                return new CSRException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    $responseArray["responseString"]
-                );
-
-            case -14:
-                return new UnknownApiException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    $responseArray["responseString"]
-                );
-
-            default:
-                return new UnknownException(
-                    $responseArray["errorCode"],
-                    $responseArray["errorMessage"],
-                    $responseArray["responseString"]
-                );
         }
     }
 }
