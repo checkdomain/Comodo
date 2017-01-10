@@ -576,14 +576,22 @@ class Util
     /**
      * Function to create an exception for API errorcodes
      *
-     * @param array $responseArray
+     * @param array|mixed $responseArray
      *
      * @return AccountException|ArgumentException|CSRException|RequestException|UnknownApiException|UnknownException
      *
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
-    protected function createException(array $responseArray)
+    protected function createException($responseArray)
     {
+        if (is_array($responseArray) === false) {
+            return new UnknownException(
+                0,
+                'Internal error',
+                $responseArray['responseString']
+            );
+        }
+
         switch ($responseArray['errorCode']) {
             case -1: // Not using https:
             case -17: // Wrong HTTP-method
