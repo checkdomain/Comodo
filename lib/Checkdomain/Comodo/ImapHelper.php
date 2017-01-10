@@ -2,7 +2,6 @@
 namespace Checkdomain\Comodo;
 
 use Zend\Mail\Storage\Message;
-use Zend\Mail\Storage\Folder;
 use Zend\Mail\Storage\Part;
 
 /**
@@ -12,18 +11,18 @@ class ImapHelper
 {
     const PROCESSED_FLAG = 'checkdomain_comodo_processed';
 
-    public static $subjects = array(
+    public static $subjects = [
         'order_received'       => 'Your order has been received',
         'confirmation'         => 'CONFIRMATION',
         'information_required' => 'Information Required',
         '1_expiry'             => 'Customer certificate expiry warning (1 days)',
         '30_expiry'            => 'Customer certificate expiry warning (30 days)',
-        '60_expiry'            => 'Customer certificate expiry warning (60 days)'
-    );
+        '60_expiry'            => 'Customer certificate expiry warning (60 days)',
+    ];
 
-    public static $bodies = array(
-        'issued' => '/Your [a-zA-Z ]* Certificate for [\*a-zA-Z0-9\_\-öäü\.]* is attached!/'
-    );
+    public static $bodies = [
+        'issued' => '/Your [a-zA-Z ]* Certificate for [\*a-zA-Z0-9\_\-öäü\.]* is attached!/',
+    ];
 
     /**
      *  Fetches the mail recursively, through the folders.
@@ -42,6 +41,8 @@ class ImapHelper
 
         $imap->selectFolder($folder);
         $result = $imap->search(array($search));
+
+        $messages = [];
 
         foreach ($result as $id) {
             $message = $imap->getMessage($id);
