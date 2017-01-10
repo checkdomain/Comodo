@@ -186,7 +186,7 @@ class ImapHelperTest extends AbstractTest
             }));
 
 
-        $messages = $this->imapHelper->fetchMails($imapAdapter, [], null, true, true);
+        $messages = $this->imapHelper->fetchMails($imapAdapter, [], true, true);
 
         $this->assertEquals($asserts, $messages);
     }
