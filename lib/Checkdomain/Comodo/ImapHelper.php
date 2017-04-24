@@ -1,6 +1,7 @@
 <?php
 namespace Checkdomain\Comodo;
 
+use Zend\Mail\Storage\Exception\RuntimeException;
 use Zend\Mail\Storage\Message;
 use Zend\Mail\Storage\Part;
 
@@ -105,7 +106,11 @@ class ImapHelper
         $flags   = $message->getFlags();
         $flags[] = self::PROCESSED_FLAG;
 
-        $imap->setFlags($id, $flags);
+        try {
+            $imap->setFlags($id, $flags);
+        } catch (RuntimeException $e) {
+            // Nothing
+        }
     }
 
     /**
