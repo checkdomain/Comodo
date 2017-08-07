@@ -1,7 +1,7 @@
 <?php
 namespace Checkdomain\Comodo;
 
-use Zend\Mail\Storage\Exception\RuntimeException;
+use Zend\Mail\Exception\ExceptionInterface;
 use Zend\Mail\Storage\Message;
 use Zend\Mail\Storage\Part;
 
@@ -46,9 +46,9 @@ class ImapHelper
         $messages = [];
 
         foreach ($result as $id) {
-            $message = $imap->getMessage($id);
-
             try {
+                $message = $imap->getMessage($id);
+
                 $messages[$id]['id']     = $id;
                 $messages[$id]['folder'] = $folder;
 
@@ -78,7 +78,7 @@ class ImapHelper
                 if (is_callable($callbackFunction)) {
                     $success = $callbackFunction($id, $messages[$id]);
                 }
-            } catch (\Exception $e) {
+            } catch (ExceptionInterface $e) {
                 // General decoding error -> removeMessage
                 unset($messages[$id]);
 
@@ -108,8 +108,8 @@ class ImapHelper
 
         try {
             $imap->setFlags($id, $flags);
-        } catch (RuntimeException $e) {
-            // Nothing
+        } catch (ExceptionInterface $e) {
+            // Nothing to do
         }
     }
 
