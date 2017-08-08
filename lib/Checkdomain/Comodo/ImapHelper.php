@@ -46,6 +46,8 @@ class ImapHelper
         $messages = [];
 
         foreach ($result as $id) {
+            $message = null;
+
             try {
                 $message = $imap->getMessage($id);
 
@@ -87,7 +89,7 @@ class ImapHelper
             }
 
             if ($markProcessed && $success) {
-                $this->markProcessed($imap, $message, $id);
+                $this->markProcessed($imap, $id, $message);
             }
         }
 
@@ -98,12 +100,12 @@ class ImapHelper
      * Marks the mail with the processed flag
      *
      * @param ImapAdapter $imap
-     * @param Message     $message
      * @param integer     $id
+     * @param Message     $message
      */
-    protected function markProcessed(ImapAdapter $imap, Message $message, $id)
+    protected function markProcessed(ImapAdapter $imap, $id, Message $message = null)
     {
-        $flags   = $message->getFlags();
+        $flags   = $message ? $message->getFlags() : [];
         $flags[] = self::PROCESSED_FLAG;
 
         try {
