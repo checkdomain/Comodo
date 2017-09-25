@@ -21,7 +21,7 @@
         "satooshi/php-coveralls": "dev-master"
     },
     "autoload": {
-        "psr-0": {
+        "psr-4": {
             "Checkdomain\\Comodo\\": "lib",
             "Checkdomain\\Comodo\\Tests": "tests"
         }
