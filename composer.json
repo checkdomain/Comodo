@@ -23,7 +23,7 @@
     "autoload": {
         "psr-4": {
             "Checkdomain\\Comodo\\": "lib",
-            "Checkdomain\\Comodo\\Tests": "tests"
+            "Checkdomain\\Comodo\\Tests\\": "tests"
         }
     }
 }
