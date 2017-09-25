@@ -30,7 +30,7 @@ class ImapHelperTest extends AbstractTest
         parent::__construct($name, $data, $dataName);
 
         $this->imapHelper = new ImapHelper();
-        $this->messages = json_decode(file_get_contents(__DIR__.'/../../data/messages/messages.json'), true);
+        $this->messages = json_decode(file_get_contents(__DIR__.'/data/messages/messages.json'), true);
     }
 
 
@@ -102,7 +102,7 @@ class ImapHelperTest extends AbstractTest
             ->expects($this->any())
             ->method('getMessage')
             ->will($this->returnValue($this->createImapRawMessage(
-                base64_decode(file_get_contents(__DIR__.'/../../data/messages/raw/multipart'))
+                base64_decode(file_get_contents(__DIR__.'/data/messages/raw/multipart'))
             )));
 
         $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
@@ -132,7 +132,7 @@ class ImapHelperTest extends AbstractTest
             ->expects($this->any())
             ->method('getMessage')
             ->will($this->returnValue($this->createImapRawMessage(
-                base64_decode(file_get_contents(__DIR__.'/../../data/messages/raw/with-attachment'))
+                base64_decode(file_get_contents(__DIR__.'/data/messages/raw/with-attachment'))
             )));
 
         $messages = $this->imapHelper->fetchMails($imapAdapter, null, true, true);
