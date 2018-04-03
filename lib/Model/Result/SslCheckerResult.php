@@ -52,12 +52,12 @@ class SslCheckerResult extends AbstractResult
     protected $certNotAfter;
 
     /**
-     * @var \DateTime
+     * @var string
      */
     protected $certValidityNotBefore;
 
     /**
-     * @var \DateTime
+     * @var string
      */
     protected $certValidityNotAfter;
 
@@ -316,6 +316,16 @@ class SslCheckerResult extends AbstractResult
     }
 
     /**
+     * @param integer $certNotBefore
+     * @return SslCheckerResult
+     */
+    public function setCertNotBeforeFromUnixTimestamp($certNotBefore)
+    {
+        $this->certNotBefore = new \DateTime("@$certNotBefore");
+        return $this;
+    }
+
+    /**
      * @return \DateTime
      */
     public function getCertNotAfter()
@@ -330,6 +340,16 @@ class SslCheckerResult extends AbstractResult
     public function setCertNotAfter($certNotAfter)
     {
         $this->certNotAfter = $certNotAfter;
+        return $this;
+    }
+
+    /**
+     * @param integer $certNotAfter
+     * @return SslCheckerResult
+     */
+    public function setCertNotAfterFromUnixTimestamp($certNotAfter)
+    {
+        $this->certNotAfter = new \DateTime("@$certNotAfter");;
         return $this;
     }
 

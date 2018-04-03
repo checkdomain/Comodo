@@ -527,8 +527,8 @@ class Util
                 ->setServerIp($responseArray['server_ip'])
                 ->setServerPort($responseArray['server_port'])
                 ->setServerSoftware($responseArray['server_software'])
-                ->setCertNotBefore($responseArray['cert_notBefore'])
-                ->setCertNotAfter($responseArray['cert_notAfter'])
+                ->setCertNotBeforeFromUnixTimestamp($responseArray['cert_notBefore'])
+                ->setCertNotAfterFromUnixTimestamp($responseArray['cert_notAfter'])
                 ->setCertValidityNotBefore($responseArray['cert_validity_notBefore'])
                 ->setCertValidityNotAfter($responseArray['cert_validity_notAfter'])
                 ->setCertKeyAlgorithm($responseArray['cert_key_algorithm'])
@@ -552,8 +552,7 @@ class Util
                 ->setCertIssuerOrganization($responseArray['cert_issuer_C'])
                 ->setCertIssuerBrand($responseArray['cert_issuer_brand'])
                 ->setCertPolicyOID($responseArray['cert_policyOID'])
-                ->setCertValidation($responseArray['cert_validation'])
-            ;
+                ->setCertValidation($responseArray['cert_validation']);
 
             return $result;
         } else {
