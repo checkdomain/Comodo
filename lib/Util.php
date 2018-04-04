@@ -14,6 +14,7 @@ use Checkdomain\Comodo\Model\Result\CollectSslResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
 use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
+use Checkdomain\Comodo\Model\Result\SslCheckerResult;
 
 /**
  * Class Util
@@ -31,6 +32,7 @@ class Util
     const COMODO_AUTO_REPLACE_URL             = 'https://secure.comodo.net/products/!AutoReplaceSSL';
     const COMODO_COLLECT_SSL_URL              = 'https://secure.comodo.net/products/download/CollectSSL';
     const COMODO_UPDATE_USER_EV_CLICK_THROUGH = 'https://secure.comodo.net/products/!UpdateUserEvClickThrough';
+    const COMODO_SSLCHECKER                   = 'https://secure.comodo.com/sslchecker';
 
     const COMODO_DCV_CODE_URL = 'https://secure.comodo.net/products/EnterDCVCode2';
 
@@ -480,6 +482,77 @@ class Util
                 ->setDomainName($responseArray['1_domainName'])
                 ->setDcvMethod($responseArray['1_dcvMethod'])
                 ->setDcvStatus($responseArray['1_dcvStatus']);
+
+            return $result;
+        } else {
+            throw $this->createException($responseArray);
+        }
+    }
+
+    /**
+     * Function to do a sslcheck
+     *
+     * https://secure.comodo.net/api/pdf/latest/SSLChecker.pdf
+     *
+     * @param array $params
+     *
+     * @return GetMDCDomainDetailsResult
+     *
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
+    public function sslChecker(array $params)
+    {
+        // Response is always new line encoded
+        $responseArray = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_SSLCHECKER,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
+
+        if ($responseArray['error_code'] == 0) {
+            $result = new SslCheckerResult();
+
+            $result
+                ->setServerUrl($responseArray['server_url'])
+                ->setServerDomainIsIDN($responseArray['server_domain_isIDN'])
+                ->setServerDomainUtf8($responseArray['server_domain_utf8'])
+                ->setServerDomainAce($responseArray['server_domain_ace'])
+                ->setServerIp($responseArray['server_ip'])
+                ->setServerPort($responseArray['server_port'])
+                ->setServerSoftware($responseArray['server_software'])
+                ->setCertNotBeforeFromUnixTimestamp($responseArray['cert_notBefore'])
+                ->setCertNotAfterFromUnixTimestamp($responseArray['cert_notAfter'])
+                ->setCertValidityNotBefore($responseArray['cert_validity_notBefore'])
+                ->setCertValidityNotAfter($responseArray['cert_validity_notAfter'])
+                ->setCertKeyAlgorithm($responseArray['cert_key_algorithm'])
+                ->setCertKeySize($responseArray['cert_key_size'])
+                ->setCertSubjectCN($responseArray['cert_subject_DN'])
+                ->setCertSubjectCN($responseArray['cert_subject_CN'])
+                ->setCertSubjectOU($responseArray['cert_subject_OU'])
+                ->setCertSubjectOrganization($responseArray['cert_subject_O'])
+                ->setCertSubjectStreetAddress1($responseArray['cert_subject_streetAddress_1'])
+                ->setCertSubjectStreetAddress2($responseArray['cert_subject_streetAddress_2'])
+                ->setCertSubjectStreetAddress3($responseArray['cert_subject_streetAddress_3'])
+                ->setCertSubjectLocality($responseArray['cert_subject_L'])
+                ->setCertSubjectState($responseArray['cert_subject_S'])
+                ->setCertSubjectPostalCode($responseArray['cert_subject_postalCode'])
+                ->setCertSubjectCountry($responseArray['cert_subject_C'])
+                ->setCertIsMultiDomain($responseArray['cert_isMultiDomain'])
+                ->setCertIsWildcard($responseArray['cert_isWildcard'])
+                ->setCertIssuerDN($responseArray['cert_issuer_DN'])
+                ->setCertIssuerCN($responseArray['cert_issuer_CN'])
+                ->setCertIssuerOrganization($responseArray['cert_issuer_O'])
+                ->setCertIssuerOrganization($responseArray['cert_issuer_C'])
+                ->setCertIssuerBrand($responseArray['cert_issuer_brand'])
+                ->setCertPolicyOID($responseArray['cert_policyOID'])
+                ->setCertValidation($responseArray['cert_validation']);
 
             return $result;
         } else {
