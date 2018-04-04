@@ -57,8 +57,8 @@ class Util
      * Constructs the Util with a communicationAdapter
      *
      * @param CommunicationAdapter|null $communicationAdapter
-     * @param ImapAdapter|null $imapAdapter
-     * @param ImapHelper|null $imapHelper
+     * @param ImapAdapter|null          $imapAdapter
+     * @param ImapHelper|null           $imapHelper
      */
     public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapAdapter, ImapHelper $imapHelper)
     {
