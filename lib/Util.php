@@ -15,6 +15,7 @@ use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
 use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
 use Checkdomain\Comodo\Model\Result\SslCheckerResult;
+use Checkdomain\Comodo\Model\Result\WebHostReportResult;
 
 /**
  * Class Util
@@ -22,17 +23,18 @@ use Checkdomain\Comodo\Model\Result\SslCheckerResult;
  */
 class Util
 {
-    const COMODO_AUTO_APPLY_URL               = 'https://secure.comodo.net/products/!AutoApplySSL';
-    const COMODO_AUTO_REVOKE_URL              = 'https://secure.comodo.net/products/!AutoRevokeSSL';
-    const COMODO_DCV_MAIL_URL                 = 'https://secure.comodo.net/products/!GetDCVEmailAddressList';
-    const COMODO_DCV_RESEND_URL               = 'https://secure.comodo.net/products/!ResendDCVEmail';
-    const COMODO_AUTO_UPDATE_DCV_URL          = 'https://secure.comodo.net/products/!AutoUpdateDCV';
-    const COMODO_PROVIDE_EV_DETAILS_URL       = 'https://secure.comodo.net/products/!ProvideEVDetails';
-    const COMODO_MDC_DOMAIN_DETAILS_URL       = 'https://secure.comodo.net/products/!GetMDCDomainDetails';
-    const COMODO_AUTO_REPLACE_URL             = 'https://secure.comodo.net/products/!AutoReplaceSSL';
-    const COMODO_COLLECT_SSL_URL              = 'https://secure.comodo.net/products/download/CollectSSL';
+    const COMODO_AUTO_APPLY_URL = 'https://secure.comodo.net/products/!AutoApplySSL';
+    const COMODO_AUTO_REVOKE_URL = 'https://secure.comodo.net/products/!AutoRevokeSSL';
+    const COMODO_DCV_MAIL_URL = 'https://secure.comodo.net/products/!GetDCVEmailAddressList';
+    const COMODO_DCV_RESEND_URL = 'https://secure.comodo.net/products/!ResendDCVEmail';
+    const COMODO_AUTO_UPDATE_DCV_URL = 'https://secure.comodo.net/products/!AutoUpdateDCV';
+    const COMODO_PROVIDE_EV_DETAILS_URL = 'https://secure.comodo.net/products/!ProvideEVDetails';
+    const COMODO_MDC_DOMAIN_DETAILS_URL = 'https://secure.comodo.net/products/!GetMDCDomainDetails';
+    const COMODO_AUTO_REPLACE_URL = 'https://secure.comodo.net/products/!AutoReplaceSSL';
+    const COMODO_COLLECT_SSL_URL = 'https://secure.comodo.net/products/download/CollectSSL';
     const COMODO_UPDATE_USER_EV_CLICK_THROUGH = 'https://secure.comodo.net/products/!UpdateUserEvClickThrough';
-    const COMODO_SSLCHECKER                   = 'https://secure.comodo.com/sslchecker';
+    const COMODO_WEB_HOST_REPORT = 'https://secure.comodo.net/products/!WebHostReport';
+    const COMODO_SSLCHECKER = 'https://secure.comodo.com/sslchecker';
 
     const COMODO_DCV_CODE_URL = 'https://secure.comodo.net/products/EnterDCVCode2';
 
@@ -55,14 +57,14 @@ class Util
      * Constructs the Util with a communicationAdapter
      *
      * @param CommunicationAdapter|null $communicationAdapter
-     * @param ImapAdapter|null          $imapAdapter
-     * @param ImapHelper|null           $imapHelper
+     * @param ImapAdapter|null $imapAdapter
+     * @param ImapHelper|null $imapHelper
      */
     public function __construct(CommunicationAdapter $communicationAdapter, ImapAdapter $imapAdapter, ImapHelper $imapHelper)
     {
         $this->communicationAdapter = $communicationAdapter;
-        $this->imapAdapter          = $imapAdapter;
-        $this->imapHelper           = $imapHelper;
+        $this->imapAdapter = $imapAdapter;
+        $this->imapHelper = $imapHelper;
     }
 
 
@@ -144,7 +146,7 @@ class Util
     public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params['responseFormat']    = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
         $params['showCertificateID'] = 'Y';
 
         // Send request
@@ -554,6 +556,48 @@ class Util
                 ->setCertPolicyOID($responseArray['cert_policyOID'])
                 ->setCertValidation($responseArray['cert_validation']);
 
+            return $result;
+        } else {
+            throw $this->createException($responseArray);
+        }
+    }
+
+    /**
+     * Function to call WebHostReport api
+     *
+     * https://secure.comodo.net/products/!WebHostReport
+     *
+     * Details for params usage:
+     * https://secure.comodo.net/api/pdf/latest/WebHostReport.pdf
+     *
+     * @param array $params
+     *
+     * @return WebHostReportResult
+     *
+     * @throws Model\Exception\AccountException
+     * @throws Model\Exception\ArgumentException
+     * @throws Model\Exception\CSRException
+     * @throws Model\Exception\RequestException
+     * @throws Model\Exception\UnknownApiException
+     * @throws Model\Exception\UnknownException
+     */
+    public function webHostReport(array $params) {
+
+        if (empty($params['lastResultNo'])) {
+            $params['lastResultNo'] = 10;
+        }
+
+        // Response is always new line encoded
+        $responseArray = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_WEB_HOST_REPORT,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
+        if ($responseArray['error_code'] == 0) {
+            $result = new WebHostReportResult();
+            $result->importEntries($responseArray);
             return $result;
         } else {
             throw $this->createException($responseArray);
