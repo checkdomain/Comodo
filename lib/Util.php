@@ -347,6 +347,15 @@ class Util
             $result = new CollectSslResult();
 
             $this->fill($result, $arr, array('notBefore', 'notAfter'));
+            
+            /*
+             * Comodo does not provide these data, when not a EV certificate (Bug?). So we fill this manually to now required.
+             * 
+             * https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/CollectSSL%20v1.17.pdf
+             */
+            if (!isset($arr['evClickThroughStatus'])) {
+                $result->setEvClickThroughStatus(-1);
+            }
 
             return $result;
         } else {
