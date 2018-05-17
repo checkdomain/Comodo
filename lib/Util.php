@@ -349,7 +349,7 @@ class Util
             $this->fill($result, $arr, array('notBefore', 'notAfter'));
             
             /*
-             * Comodo does not provide these data, when not a EV certificate (Bug?). So we fill this manually to now required.
+             * Comodo does not provide these data, when not a EV certificate (Bug?). So we fill this manually to "not required".
              * 
              * https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/CollectSSL%20v1.17.pdf
              */
