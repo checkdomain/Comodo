@@ -442,6 +442,10 @@ class Util
 
         if ($responseArray['errorCode'] == 0) {
             $result = new GetDCVEMailAddressListResult();
+            
+            if (isset($responseArray['whois_email'][0]) && $responseArray['whois_email'][0] == 'none') {
+                unset($responseArray['whois_email'][0]);
+            }
 
             $result
                 ->setDomainName($responseArray['domain_name'])
