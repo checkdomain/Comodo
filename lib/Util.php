@@ -171,6 +171,10 @@ class Util
                 ->setOrderNumber($arr['orderNumber'])
                 ->setTotalCost($arr['totalCost'])
                 ->setRequestQuery($arr['requestQuery']);
+            
+            if (isset($arr['uniqueValue'])) {
+                $result->setUniqueValue($arr['uniqueValue']);
+            }
 
             return $result;
         } else {
@@ -220,7 +224,7 @@ class Util
      *
      * @param array $params
      *
-     * @return AutoApplyResult
+     * @return AutoReplaceResult
      * @throws Model\Exception\AccountException
      * @throws Model\Exception\ArgumentException
      * @throws Model\Exception\CSRException
@@ -249,6 +253,10 @@ class Util
             $result
                 ->setCertificateID($arr['certificateID'])
                 ->setExpectedDeliveryTime($arr['expectedDeliveryTime']);
+
+            if (isset($arr['uniqueValue'])) {
+                $result->setUniqueValue($arr['uniqueValue']);
+            }
 
             return $result;
         } else {

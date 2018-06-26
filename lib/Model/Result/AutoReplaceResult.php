@@ -8,11 +8,12 @@ class AutoReplaceResult extends AbstractResult
 {
     protected $certificateID;
     protected $expectedDeliveryTime;
+    protected $uniqueValue;
 
     /**
      * @param mixed $certificateID
      *
-     * @return AutoApplyResult
+     * @return AutoReplaceResult
      */
     public function setCertificateID($certificateID)
     {
@@ -32,7 +33,7 @@ class AutoReplaceResult extends AbstractResult
     /**
      * @param int $expectedDeliveryTime
      *
-     * @return AutoApplyResult
+     * @return AutoReplaceResult
      */
     public function setExpectedDeliveryTime($expectedDeliveryTime)
     {
@@ -47,5 +48,25 @@ class AutoReplaceResult extends AbstractResult
     public function getExpectedDeliveryTime()
     {
         return $this->expectedDeliveryTime;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueValue()
+    {
+        return $this->uniqueValue;
+    }
+
+    /**
+     * @param string $uniqueValue
+     *
+     * @return AutoReplaceResult
+     */
+    public function setUniqueValue($uniqueValue)
+    {
+        $this->uniqueValue = $uniqueValue;
+
+        return $this;
     }
 }

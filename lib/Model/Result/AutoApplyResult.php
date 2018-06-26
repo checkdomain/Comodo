@@ -12,6 +12,7 @@ class AutoApplyResult extends AbstractResult
     protected $totalCost;
     protected $paid;
     protected $certificateID;
+    protected $uniqueValue;
 
     /**
      * @param bool $paid
@@ -112,5 +113,25 @@ class AutoApplyResult extends AbstractResult
     public function getTotalCost()
     {
         return $this->totalCost;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUniqueValue()
+    {
+        return $this->uniqueValue;
+    }
+
+    /**
+     * @param string $uniqueValue
+     *
+     * @return AutoApplyResult
+     */
+    public function setUniqueValue($uniqueValue)
+    {
+        $this->uniqueValue = $uniqueValue;
+
+        return $this;
     }
 }
