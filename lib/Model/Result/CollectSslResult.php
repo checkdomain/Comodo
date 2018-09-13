@@ -12,6 +12,11 @@ class CollectSslResult extends AbstractResult
     protected $orderNumber;
 
     /**
+     * @var integer
+     */
+    protected $errorCode;
+
+    /**
      * @var \DateTime
      */
     protected $notBefore;
@@ -416,6 +421,26 @@ class CollectSslResult extends AbstractResult
     public function setOrderNumber($orderNumber)
     {
         $this->orderNumber = $orderNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getErrorCode()
+    {
+        return $this->errorCode;
+    }
+
+    /**
+     * @param int $errorCode
+     *
+     * @return $this
+     */
+    public function setErrorCode($errorCode)
+    {
+        $this->errorCode = $errorCode;
 
         return $this;
     }
