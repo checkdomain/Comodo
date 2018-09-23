@@ -109,7 +109,7 @@ class CollectSslResult extends AbstractResult
     /**
      * @var integer
      */
-    protected $brandValidationStatus;
+    protected $brandValStatus;
 
     /**
      * @param bool $wrapCrt
@@ -273,19 +273,19 @@ class CollectSslResult extends AbstractResult
     /**
      * @return int
      */
-    public function getBrandValidationStatus()
+    public function getBrandValStatus()
     {
-        return $this->brandValidationStatus;
+        return $this->brandValStatus;
     }
 
     /**
-     * @param int $brandValidationStatus
+     * @param int $brandValStatus
      *
      * @return CollectSslResult
      */
-    public function setBrandValidationStatus($brandValidationStatus)
+    public function setBrandValStatus($brandValStatus)
     {
-        $this->brandValidationStatus = $brandValidationStatus;
+        $this->brandValStatus = $brandValStatus;
 
         return $this;
     }
