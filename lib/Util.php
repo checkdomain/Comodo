@@ -365,6 +365,10 @@ class Util
                 $result->setEvClickThroughStatus(-1);
             }
 
+            if (!isset($arr['brandValidationStatus'])) {
+                $result->setBrandValidationStatus(-1);
+            }
+
             return $result;
         } else {
             throw $this->createException($arr);

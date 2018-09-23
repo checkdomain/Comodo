@@ -107,6 +107,11 @@ class CollectSslResult extends AbstractResult
     protected $evClickThroughStatus;
 
     /**
+     * @var integer
+     */
+    protected $brandValidationStatus;
+
+    /**
      * @param bool $wrapCrt
      * @param bool $addDelimiter
      *
@@ -261,6 +266,26 @@ class CollectSslResult extends AbstractResult
     public function setEvClickThroughStatus($evClickThroughStatus)
     {
         $this->evClickThroughStatus = $evClickThroughStatus;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getBrandValidationStatus()
+    {
+        return $this->brandValidationStatus;
+    }
+
+    /**
+     * @param int $brandValidationStatus
+     *
+     * @return CollectSslResult
+     */
+    public function setBrandValidationStatus($brandValidationStatus)
+    {
+        $this->brandValidationStatus = $brandValidationStatus;
 
         return $this;
     }
