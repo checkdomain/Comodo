@@ -158,7 +158,7 @@ class Util
     public function autoRefund(array $params)
     {
         if (false === isset($params['refundReasonCode'])) {
-            $params['refundReasonCode'] = 11;
+            $params['refundReasonCode'] = self::AUTO_REFUND_REASON_OTHER;
         }
 
         $response = $this
