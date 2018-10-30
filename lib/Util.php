@@ -23,6 +23,19 @@ use Checkdomain\Comodo\Model\Result\WebHostReportResult;
  */
 class Util
 {
+    const AUTO_REFUND_REASON_VALIDATION = 1;
+    const AUTO_REFUND_REASON_INACTIVE = 2;
+    const AUTO_REFUND_REASON_TYPE = 3;
+    const AUTO_REFUND_REASON_BRAND = 4;
+    const AUTO_REFUND_REASON_REJECTED = 5;
+    const AUTO_REFUND_REASON_MALWARE = 6;
+    const AUTO_REFUND_REASON_PHISHING = 7;
+    const AUTO_REFUND_REASON_SAFE_BROWSING = 8;
+    const AUTO_REFUND_REASON_AUTHORITY = 9;
+    const AUTO_REFUND_REASON_PRICE = 10;
+    const AUTO_REFUND_REASON_OTHER = 11;
+
+    const COMODO_AUTO_REFUND_URL                = 'https://secure.comodo.net/products/!AutoRefund';
     const COMODO_AUTO_APPLY_URL                 = 'https://secure.comodo.net/products/!AutoApplySSL';
     const COMODO_AUTO_REVOKE_URL                = 'https://secure.comodo.net/products/!AutoRevokeSSL';
     const COMODO_DCV_MAIL_URL                   = 'https://secure.comodo.net/products/!GetDCVEmailAddressList';
@@ -126,6 +139,41 @@ class Util
         $this->imapAdapter = $imapAdapter;
 
         return $this;
+    }
+
+    /**
+     * Refunds a ordered certificate
+     *
+     * @param array $params
+     *
+     * @return bool
+     *
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     */
+    public function autoRefund(array $params)
+    {
+        if (false === isset($params['refundReasonCode'])) {
+            $params['refundReasonCode'] = 11;
+        }
+
+        $response = $this
+            ->communicationAdapter
+            ->sendToApi(
+                self::COMODO_AUTO_REFUND_URL,
+                $params,
+                CommunicationAdapter::RESPONSE_URL_ENCODED
+            );
+
+        if ($response['errorCode'] == 0) {
+            return true;
+        } else {
+            throw $this->createException($response);
+        }
     }
 
     /**
