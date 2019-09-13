@@ -35,21 +35,20 @@ class Util
     const AUTO_REFUND_REASON_PRICE = 10;
     const AUTO_REFUND_REASON_OTHER = 11;
 
-    const COMODO_AUTO_REFUND_URL                = 'https://secure.comodo.net/products/!AutoRefund';
-    const COMODO_AUTO_APPLY_URL                 = 'https://secure.comodo.net/products/!AutoApplySSL';
-    const COMODO_AUTO_REVOKE_URL                = 'https://secure.comodo.net/products/!AutoRevokeSSL';
-    const COMODO_DCV_MAIL_URL                   = 'https://secure.comodo.net/products/!GetDCVEmailAddressList';
-    const COMODO_DCV_RESEND_URL                 = 'https://secure.comodo.net/products/!ResendDCVEmail';
-    const COMODO_AUTO_UPDATE_DCV_URL            = 'https://secure.comodo.net/products/!AutoUpdateDCV';
-    const COMODO_PROVIDE_EV_DETAILS_URL         = 'https://secure.comodo.net/products/!ProvideEVDetails';
-    const COMODO_MDC_DOMAIN_DETAILS_URL         = 'https://secure.comodo.net/products/!GetMDCDomainDetails';
-    const COMODO_AUTO_REPLACE_URL               = 'https://secure.comodo.net/products/!AutoReplaceSSL';
-    const COMODO_COLLECT_SSL_URL                = 'https://secure.comodo.net/products/download/CollectSSL';
-    const COMODO_UPDATE_USER_EV_CLICK_THROUGH   = 'https://secure.comodo.net/products/!UpdateUserEvClickThrough';
-    const COMODO_WEB_HOST_REPORT                = 'https://secure.comodo.net/products/!WebHostReport';
-    const COMODO_SSLCHECKER                     = 'https://secure.comodo.com/sslchecker';
-
-    const COMODO_DCV_CODE_URL                   = 'https://secure.comodo.net/products/EnterDCVCode2';
+    const COMODO_AUTO_REFUND_URL                = 'https://secure.trust-provider.com/products/!AutoRefund';
+    const COMODO_AUTO_APPLY_URL                 = 'https://secure.trust-provider.com/products/!AutoApplySSL';
+    const COMODO_AUTO_REVOKE_URL                = 'https://secure.trust-provider.com/products/!AutoRevokeSSL';
+    const COMODO_DCV_MAIL_URL                   = 'https://secure.trust-provider.com/products/!GetDCVEmailAddressList';
+    const COMODO_DCV_RESEND_URL                 = 'https://secure.trust-provider.com/products/!ResendDCVEmail';
+    const COMODO_AUTO_UPDATE_DCV_URL            = 'https://secure.trust-provider.com/products/!AutoUpdateDCV';
+    const COMODO_PROVIDE_EV_DETAILS_URL         = 'https://secure.trust-provider.com/products/!ProvideEVDetails';
+    const COMODO_MDC_DOMAIN_DETAILS_URL         = 'https://secure.trust-provider.com/products/!GetMDCDomainDetails';
+    const COMODO_AUTO_REPLACE_URL               = 'https://secure.trust-provider.com/products/!AutoReplaceSSL';
+    const COMODO_COLLECT_SSL_URL                = 'https://secure.trust-provider.com/products/download/CollectSSL';
+    const COMODO_UPDATE_USER_EV_CLICK_THROUGH   = 'https://secure.trust-provider.com/products/!UpdateUserEvClickThrough';
+    const COMODO_WEB_HOST_REPORT                = 'https://secure.trust-provider.com/products/!WebHostReport';
+    const COMODO_SSLCHECKER                     = 'https://secure.trust-provider.com/sslchecker';
+    const COMODO_DCV_CODE_URL                   = 'https://secure.trust-provider.com/products/EnterDCVCode2';
 
     /**
      * @var CommunicationAdapter
