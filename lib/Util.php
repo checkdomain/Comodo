@@ -8,11 +8,13 @@ use Checkdomain\Comodo\Model\Exception\RequestException;
 use Checkdomain\Comodo\Model\Exception\UnknownApiException;
 use Checkdomain\Comodo\Model\Exception\UnknownException;
 
+use Checkdomain\Comodo\Model\Result\ApplyCustomClientCertResult;
 use Checkdomain\Comodo\Model\Result\AutoApplyResult;
 use Checkdomain\Comodo\Model\Result\AutoReplaceResult;
 use Checkdomain\Comodo\Model\Result\CollectSslResult;
 use Checkdomain\Comodo\Model\Result\GetDCVEMailAddressListResult;
 use Checkdomain\Comodo\Model\Result\GetMDCDomainDetailsResult;
+use Checkdomain\Comodo\Model\Result\PlaceOrderResult;
 use Checkdomain\Comodo\Model\Result\UpdateUserEvClickThroughResult;
 use Checkdomain\Comodo\Model\Result\SslCheckerResult;
 use Checkdomain\Comodo\Model\Result\WebHostReportResult;
@@ -49,6 +51,10 @@ class Util
     const COMODO_WEB_HOST_REPORT                = 'https://secure.trust-provider.com/products/!WebHostReport';
     const COMODO_SSLCHECKER                     = 'https://secure.trust-provider.com/sslchecker';
     const COMODO_DCV_CODE_URL                   = 'https://secure.trust-provider.com/products/EnterDCVCode2';
+    const COMODO_PLACE_ORDER_URL = 'https://secure.trust-provider.com/products/!PlaceOrder';
+    const COMODO_APPLY_CUSTOM_CLIENT_CERT_URL = 'https://secure.trust-provider.com/products/!ApplyCustomClientCert';
+    const COMODO_AUTO_REPLACE_CS_URL = 'https://secure.trust-provider.com/products/!AutoReplaceCS';
+    const COMODO_AUTO_AUTHORIZE_URL = 'https://secure.trust-provider.com/products/!AutoAuthorize';
 
     /**
      * @var CommunicationAdapter
@@ -900,5 +906,118 @@ class Util
         } else {
             throw $this->createException($responseArray);
         }
+    }
+
+    /**
+     * @param array $params
+     * @return ApplyCustomClientCertResult
+     *
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     *
+     * @see https://sectigo.com/uploads/files/ApplyCustomClientCert-v1.07.pdf
+     */
+    public function applyCustomClientCert(array $params)
+    {
+        // Two choices, we want url-encoded
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+
+        // Send request
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(self::COMODO_APPLY_CUSTOM_CLIENT_CERT_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        // Successful
+        if ($arr['errorCode'] == 1 || $arr['errorCode'] == 0) {
+            $result = new ApplyCustomClientCertResult();
+            $result
+                ->setOrderNumber($arr['orderNumber'])
+                ->setCollectionCode($arr['collectionCode']);
+
+            return $result;
+        }
+
+        throw $this->createException($arr);
+    }
+
+    /**
+     * @param array $params
+     * @return bool
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     *
+     * @see https://sectigo.com/uploads/files/AutoReplaceCS-v1.00.pdf
+     */
+    public function autoReplaceCS(array $params)
+    {
+        return $this->sendBooleanRequest(
+            self::COMODO_AUTO_REPLACE_CS_URL,
+            $params,
+            CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
+    }
+
+    /**
+     * @param array $params
+     * @return PlaceOrderResult
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     *
+     * @see https://sectigo.com/uploads/files/PlaceOrder-API-for-Affiliates-v1.16.pdf
+     */
+    public function placeOrder(array $params)
+    {
+        // Two choices, we want url-encoded
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+
+        // Send request
+        $arr = $this
+            ->communicationAdapter
+            ->sendToApi(self::COMODO_PLACE_ORDER_URL, $params, CommunicationAdapter::RESPONSE_URL_ENCODED);
+
+        // Successful
+        if ($arr['errorCode'] == 1 || $arr['errorCode'] == 0) {
+            $result = new PlaceOrderResult();
+            $result
+                ->setOrderNumber($arr['orderNumber'])
+                ->setCollectionCode($arr['collectionCode']);
+
+            return $result;
+        }
+
+        throw $this->createException($arr);
+    }
+
+    /**
+     * @param array $params
+     * @return bool
+     * @throws AccountException
+     * @throws ArgumentException
+     * @throws CSRException
+     * @throws RequestException
+     * @throws UnknownApiException
+     * @throws UnknownException
+     *
+     * @see https://sectigo.com/uploads/files/AutoAuthorize-and-AutoReject-v1.01.pdf
+     */
+    public function autoAuthorize(array $params)
+    {
+        return $this->sendBooleanRequest(
+            self::COMODO_AUTO_AUTHORIZE_URL,
+            $params,
+            CommunicationAdapter::RESPONSE_URL_ENCODED
+        );
     }
 }
