@@ -51,10 +51,10 @@ class Util
     const COMODO_WEB_HOST_REPORT                = 'https://secure.trust-provider.com/products/!WebHostReport';
     const COMODO_SSLCHECKER                     = 'https://secure.trust-provider.com/sslchecker';
     const COMODO_DCV_CODE_URL                   = 'https://secure.trust-provider.com/products/EnterDCVCode2';
-    const COMODO_PLACE_ORDER_URL = 'https://secure.trust-provider.com/products/!PlaceOrder';
-    const COMODO_APPLY_CUSTOM_CLIENT_CERT_URL = 'https://secure.trust-provider.com/products/!ApplyCustomClientCert';
-    const COMODO_AUTO_REPLACE_CS_URL = 'https://secure.trust-provider.com/products/!AutoReplaceCS';
-    const COMODO_AUTO_AUTHORIZE_URL = 'https://secure.trust-provider.com/products/!AutoAuthorize';
+    const COMODO_PLACE_ORDER_URL                = 'https://secure.trust-provider.com/products/!PlaceOrder';
+    const COMODO_APPLY_CUSTOM_CLIENT_CERT_URL   = 'https://secure.trust-provider.com/products/!ApplyCustomClientCert';
+    const COMODO_AUTO_REPLACE_CS_URL            = 'https://secure.trust-provider.com/products/!AutoReplaceCS';
+    const COMODO_AUTO_AUTHORIZE_URL             = 'https://secure.trust-provider.com/products/!AutoAuthorize';
 
     /**
      * @var CommunicationAdapter
