@@ -199,7 +199,7 @@ class Util
     public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params['responseFormat']    = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
         $params['showCertificateID'] = 'Y';
 
         // Send request
@@ -224,7 +224,7 @@ class Util
                 ->setOrderNumber($arr['orderNumber'])
                 ->setTotalCost($arr['totalCost'])
                 ->setRequestQuery($arr['requestQuery']);
-            
+
             if (isset($arr['uniqueValue'])) {
                 $result->setUniqueValue($arr['uniqueValue']);
             }
@@ -289,6 +289,7 @@ class Util
     {
         // Two choices, we want url-encoded
         $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['showCertificateID'] = 'Y';
 
         // Send request
         $arr = $this
@@ -408,10 +409,10 @@ class Util
             $result = new CollectSslResult();
 
             $this->fill($result, $arr, array('notBefore', 'notAfter'));
-            
+
             /*
              * Comodo does not provide these data, when not a EV certificate (Bug?). So we fill this manually to "not required".
-             * 
+             *
              * https://secure.comodo.net/api/pdf/webhostreseller/sslcertificates/CollectSSL%20v1.17.pdf
              */
             if (!isset($arr['evClickThroughStatus'])) {
@@ -507,7 +508,7 @@ class Util
 
         if ($responseArray['errorCode'] == 0) {
             $result = new GetDCVEMailAddressListResult();
-            
+
             if (isset($responseArray['whois_email'][0]) && $responseArray['whois_email'][0] == 'none') {
                 unset($responseArray['whois_email'][0]);
             }
@@ -659,8 +660,8 @@ class Util
      * @throws Model\Exception\UnknownApiException
      * @throws Model\Exception\UnknownException
      */
-    public function webHostReport(array $params) {
-
+    public function webHostReport(array $params)
+    {
         if (empty($params['lastResultNo'])) {
             $params['lastResultNo'] = 10;
         }
