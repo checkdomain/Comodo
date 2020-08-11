@@ -199,7 +199,7 @@ class Util
     public function autoApplySSL(array $params)
     {
         // Two choices, we want url-encoded
-        $params['responseFormat']    = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
         $params['showCertificateID'] = 'Y';
 
         // Send request
@@ -289,6 +289,7 @@ class Util
     {
         // Two choices, we want url-encoded
         $params['responseFormat'] = CommunicationAdapter::RESPONSE_URL_ENCODED;
+        $params['showCertificateID'] = 'Y';
 
         // Send request
         $arr = $this
