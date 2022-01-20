@@ -3,6 +3,13 @@ namespace Checkdomain\Comodo;
 
 use Checkdomain\Comodo\Model\Account;
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\MessageFormatter;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use Psr\Log\NullLogger;
 
 /**
  * Class CommunicationAdapter
@@ -25,6 +32,21 @@ class CommunicationAdapter
     protected $account;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
+     * @var HandlerStack
+     */
+    protected $handlerStack;
+
+    /**
+     * @var array
+     */
+    protected $denyList;
+
+    /**
      * @param \Checkdomain\Comodo\Model\Account $account
      *
      * @return CommunicationAdapter
@@ -44,14 +66,18 @@ class CommunicationAdapter
         return $this->account;
     }
 
-    /**
-     * Constructs a communication adapter with an account
-     *
-     * @param Account $account
-     */
-    public function __construct(Account $account = null)
+    public function __construct(Account $account = null, LoggerInterface $logger = null, array $denyList = [])
     {
         $this->account = $account;
+        $this->denyList = $denyList;
+        $this->handlerStack = HandlerStack::create();
+
+        if ($logger) {
+            $this->logger = $logger;
+            $this->handlerStack = $this->addLogMiddleware($this->handlerStack);
+        } else {
+            $this->logger = new NullLogger();
+        }
     }
 
     /**
@@ -72,7 +98,7 @@ class CommunicationAdapter
     public function getClient()
     {
         if ($this->client === null) {
-            $this->client = new Client();
+            $this->client = new Client(['handler' => $this->handlerStack]);
         }
 
         return $this->client;
@@ -280,5 +306,31 @@ class CommunicationAdapter
         }
 
         return $responseArray;
+    }
+
+    protected function addLogMiddleware(HandlerStack $handlerStack)
+    {
+        $handlerStack->push(
+            Middleware::mapResponse(
+                function (ResponseInterface $response) {
+                    $response->getBody()->rewind();
+
+                    return $response;
+                }
+            )
+        );
+
+        $handlerStack->push(
+            Middleware::log(
+                $this->logger,
+                new SanitizingMessageFormatter(
+                    '{method} {uri} HTTP/{version} - Body: {req_body} | {code} - Body: {res_body}',
+                    $this->denyList
+                ),
+                LogLevel::DEBUG
+            )
+        );
+
+        return $handlerStack;
     }
 }
