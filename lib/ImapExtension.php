@@ -1,7 +1,7 @@
 <?php
 namespace Checkdomain\Comodo;
 
-use Zend\Mail\Storage\Imap;
+use Laminas\Mail\Storage\Imap;
 
 /**
  * @package Checkdomain\Comodo

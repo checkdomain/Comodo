@@ -13,8 +13,8 @@
     ],
     "require": {
         "php": ">=5.5",
-        "zendframework/zend-mail": ">= 2.7.2",
-        "guzzlehttp/guzzle": "^6.0"
+        "guzzlehttp/guzzle": "^6.0",
+        "laminas/laminas-mail": "^2.23"
     },
     "require-dev": {
         "phpunit/phpunit": "~3.7",

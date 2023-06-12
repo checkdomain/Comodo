@@ -10,7 +10,7 @@ use Checkdomain\Comodo\Util;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
-use Zend\Mail\Storage\Folder;
+use Laminas\Mail\Storage\Folder;
 
 /**
  * Class AbstractTest

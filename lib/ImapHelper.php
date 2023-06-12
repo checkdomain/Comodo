@@ -1,10 +1,9 @@
 <?php
 namespace Checkdomain\Comodo;
 
-use Zend\Mail\Exception\ExceptionInterface;
-use Zend\Mail\Storage\Message;
-use Zend\Mail\Storage\Part;
-
+use Laminas\Mail\Exception\ExceptionInterface;
+use Laminas\Mail\Storage\Message;
+use Laminas\Mail\Storage\Part;
 /**
  * Class ImapHelper
  */
