@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
+<phpunit
+    bootstrap = "./vendor/autoload.php">
+    <testsuites>
+        <testsuite name="Checkdomain Comodo Test Suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory>./</directory>
+            <exclude>
+                <directory>./tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
+
+    <php>
+        <ini name="error_reporting" value="E_ALL"/>
+    </php>
+</phpunit>

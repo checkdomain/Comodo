@@ -3,7 +3,7 @@ namespace Checkdomain\Comodo\Tests;
 
 use Checkdomain\Comodo\ImapExtension;
 use Checkdomain\Comodo\ImapHelper;
-use Zend\Mail\Storage\Message;
+use Laminas\Mail\Storage\Message;
 
 /**
  * Class ImapHelperTest

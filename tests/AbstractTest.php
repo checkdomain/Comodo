@@ -15,10 +15,10 @@ use Laminas\Mail\Storage\Folder;
 /**
  * Class AbstractTest
  */
-abstract class AbstractTest extends \PHPUnit_Framework_TestCase
+abstract class AbstractTest extends \PHPUnit\Framework\TestCase
 {
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapHelper
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Checkdomain\Comodo\ImapHelper
      */
     public function createImapHelper()
     {
@@ -31,7 +31,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapAdapter
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Checkdomain\Comodo\ImapAdapter
      */
     protected function createImapAdapter()
     {
@@ -42,7 +42,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|\Checkdomain\Comodo\ImapExtension
+     * @return \PHPUnit\Framework\MockObject\MockObject|\Checkdomain\Comodo\ImapExtension
      */
     protected function createImapExtension()
     {
@@ -86,7 +86,7 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
      *
      * @param $responseString
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|\GuzzleHttp\Client
+     * @return \PHPUnit\Framework\MockObject\MockObject|\GuzzleHttp\Client
      */
     protected function createGuzzleClient($responseString)
     {

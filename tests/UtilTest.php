@@ -213,6 +213,7 @@ class UtilTest extends AbstractTest
             'errorMessage' => 'Invalid Request',
         ])));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\RequestException::class);
         $util->autoApplySSL([]);
     }
 
@@ -227,6 +228,7 @@ class UtilTest extends AbstractTest
             'errorMessage' => 'Invalid Request',
         ])));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\ArgumentException::class);
         $util->autoApplySSL([]);
     }
 
@@ -240,6 +242,7 @@ class UtilTest extends AbstractTest
             'errorMessage' => 'Invalid Request',
         ])));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\AccountException::class);
         $util->autoApplySSL([]);
     }
 
@@ -253,6 +256,7 @@ class UtilTest extends AbstractTest
             'errorMessage' => 'Invalid Request',
         ])));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\CsrException::class);
         $util->autoApplySSL([]);
     }
 
@@ -266,6 +270,7 @@ class UtilTest extends AbstractTest
             'errorMessage' => 'Invalid Request',
         ])));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\UnknownApiException::class);
         $util->autoApplySSL([]);
     }
 
@@ -276,6 +281,7 @@ class UtilTest extends AbstractTest
     {
         $util = $this->createUtil($this->createGuzzleClient('Internal Server Error'));
 
+        $this->expectException(\Checkdomain\Comodo\Model\Exception\UnknownException::class);
         $util->autoApplySSL([]);
     }
 
